@@ -1,0 +1,1742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SwimIQ — School Management</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --a:#0EA5E9;--a2:#10B981;--a3:#8B5CF6;--a4:#F59E0B;--danger:#EF4444;--warn:#F59E0B;
+  --bg:#070D18;--s1:#0D1825;--s2:#121F30;--s3:#18293D;--s4:#1F3350;
+  --b1:#1E3048;--b2:#254060;--b3:#2C4E74;
+  --t1:#EEF5FF;--t2:#7BAAC8;--t3:#3A5F7A;--t4:#1E3A4D;
+  --r:8px;--rl:13px;--sw:252px;--pb:#F5C542;
+}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--t1);height:100vh;overflow:hidden}
+
+/* ======= LOGIN ======= */
+#ls{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:1000;flex-direction:column}
+.lbg{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.lbg::before{content:'';position:absolute;width:480px;height:480px;border-radius:50%;background:radial-gradient(circle,rgba(14,165,233,.18) 0%,transparent 70%);top:-160px;right:-80px;animation:lp 4s ease-in-out infinite}
+.lbg::after{content:'';position:absolute;width:350px;height:350px;border-radius:50%;background:radial-gradient(circle,rgba(16,185,129,.12) 0%,transparent 70%);bottom:-80px;left:-40px;animation:lp 5s ease-in-out infinite .9s}
+@keyframes lp{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.08);opacity:1}}
+.lcard{background:var(--s1);border:1px solid var(--b2);border-radius:18px;padding:2.2rem;width:100%;max-width:385px;position:relative;z-index:1;box-shadow:0 32px 72px rgba(0,0,0,.65)}
+.llogo{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:4px;color:var(--a);text-align:center;line-height:1}
+.llogo span{color:var(--a2)}
+.lsub{text-align:center;font-size:10px;color:var(--t3);letter-spacing:2px;text-transform:uppercase;margin:.3rem 0 1.6rem}
+.linp{margin-bottom:.7rem}
+.linp label{display:block;font-size:9px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
+.linp input{width:100%;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r);padding:10px 13px;font-size:13px;font-family:'Sora',sans-serif;color:var(--t1);outline:none;transition:border-color .18s}
+.linp input:focus{border-color:var(--a)}
+.lbtn{width:100%;background:linear-gradient(135deg,var(--a),var(--a2));color:#fff;border:none;border-radius:var(--r);padding:12px;font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-top:.5rem;letter-spacing:.3px;transition:opacity .18s}
+.lbtn:hover{opacity:.9}
+.lerr{color:var(--danger);font-size:11px;text-align:center;margin-top:.4rem;min-height:16px}
+.demobox{margin-top:1.2rem;padding-top:1.1rem;border-top:1px solid var(--b1)}
+.demolbl{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin-bottom:.5rem;text-align:center}
+.dpills{display:flex;flex-wrap:wrap;gap:4px;justify-content:center}
+.dp{padding:4px 11px;border-radius:20px;font-size:10px;font-weight:600;cursor:pointer;border:1px solid;transition:opacity .15s;user-select:none}
+.dp:hover{opacity:.8}
+
+/* ======= APP ======= */
+#app{display:none;height:100vh;flex-direction:column}
+#app.on{display:flex}
+.shell{display:flex;flex:1;overflow:hidden}
+
+/* ======= HEADER ======= */
+.hdr{height:50px;background:var(--s1);border-bottom:1px solid var(--b1);display:flex;align-items:center;padding:0 .9rem;gap:10px;flex-shrink:0;z-index:30}
+.hdr-logo{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:var(--a);line-height:1}
+.hdr-logo span{color:var(--a2)}
+.hdr-sep{width:1px;height:18px;background:var(--b2)}
+.hdr-pg{font-size:12px;font-weight:600;color:var(--t2)}
+.hdr-r{margin-left:auto;display:flex;align-items:center;gap:6px}
+.hbtn{background:var(--s2);color:var(--t2);border:1px solid var(--b2);border-radius:var(--r);padding:5px 10px;font-family:'Sora',sans-serif;font-size:10px;cursor:pointer;transition:all .15s}
+.hbtn:hover{color:var(--a2);border-color:var(--a2)}
+.uchip{display:flex;align-items:center;gap:6px;padding:4px 9px;border-radius:20px;background:var(--s2);border:1px solid var(--b2);cursor:pointer;transition:border-color .15s}
+.uchip:hover{border-color:var(--a)}
+.uav{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:9px;font-weight:700;flex-shrink:0}
+.uname{font-size:11px;font-weight:600}
+.rbadge{font-size:8px;padding:1px 5px;border-radius:10px;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+.rb-admin{background:#1E3A5F;color:#60A5FA}
+.rb-coach{background:#0F3330;color:#34D399}
+.rb-athlete{background:#2D1A4D;color:#C084FC}
+.rb-parent{background:#3D2E00;color:#FCD34D}
+
+/* ======= SIDEBAR ======= */
+.sb{width:var(--sw);background:var(--s1);border-right:1px solid var(--b1);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
+.sb-search{padding:.55rem;border-bottom:1px solid var(--b1);position:relative}
+.sb-si{position:absolute;left:20px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--t3);pointer-events:none}
+.sb-search input{width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:6px 10px 6px 27px;font-size:11px;font-family:'Sora',sans-serif;color:var(--t1);outline:none;transition:border-color .15s}
+.sb-search input:focus{border-color:var(--a)}
+.sb-search input::placeholder{color:var(--t3)}
+.sb-nav{padding:.35rem;border-bottom:1px solid var(--b1)}
+.nv{display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:var(--r);font-size:11px;font-weight:500;color:var(--t2);cursor:pointer;transition:all .15s;border:none;background:none;width:100%;text-align:left}
+.nv:hover{background:var(--s2);color:var(--t1)}
+.nv.act{background:linear-gradient(135deg,rgba(14,165,233,.18),rgba(16,185,129,.1));color:var(--t1);border-left:2px solid var(--a);padding-left:6px}
+.nv-ic{font-size:13px;width:17px;text-align:center;flex-shrink:0}
+.nbadge{margin-left:auto;background:var(--danger);color:#fff;font-size:8px;font-weight:700;padding:1px 4px;border-radius:10px;min-width:14px;text-align:center}
+.sb-athletes{flex:1;overflow-y:auto;padding:.35rem}
+.sb-athletes::-webkit-scrollbar{width:2px}
+.sb-athletes::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+.sb-slbl{font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:1.5px;padding:5px 8px 3px}
+.ti{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:var(--r);cursor:pointer;transition:all .15s}
+.ti:hover{background:var(--s2)}
+.ti.sel{background:var(--s3);border-left:2px solid var(--a);padding-left:6px}
+.tiav{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:10px;flex-shrink:0;overflow:hidden}
+.tiav img{width:100%;height:100%;object-fit:cover}
+.tname{font-size:11px;font-weight:500;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tdot{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:1px}
+.sb-addbtn{margin:.4rem;background:var(--s2);border:1px dashed var(--b2);border-radius:var(--r);padding:6px;font-size:11px;font-family:'Sora',sans-serif;color:var(--t2);cursor:pointer;width:calc(100% - .8rem);transition:all .15s}
+.sb-addbtn:hover{border-color:var(--a);color:var(--a)}
+
+/* ======= MAIN ======= */
+.main{flex:1;overflow-y:auto;background:var(--bg)}
+.main::-webkit-scrollbar{width:4px}
+.main::-webkit-scrollbar-thumb{background:var(--b2);border-radius:4px}
+.pw{padding:1.1rem;max-width:1200px}
+.pg{display:none}.pg.act{display:block}
+
+/* ======= TOPBAR ======= */
+.tpbar{display:flex;align-items:center;justify-content:space-between;padding:.65rem 1.1rem;background:var(--s1);border-bottom:1px solid var(--b1);position:sticky;top:0;z-index:20}
+.tp-ttl{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1.5px}
+.tp-act{display:flex;gap:5px;align-items:center}
+
+/* ======= BUTTONS ======= */
+.btn{background:var(--a);color:#fff;border:none;border-radius:var(--r);padding:7px 14px;font-family:'Sora',sans-serif;font-size:11px;cursor:pointer;font-weight:600;transition:opacity .15s;white-space:nowrap}
+.btn:hover{opacity:.85}
+.btn-sm{padding:4px 10px;font-size:10px}
+.btn-xs{padding:3px 8px;font-size:9px}
+.btn-g{background:var(--a2);color:#111}
+.btn-p{background:var(--a3)}
+.btn-y{background:var(--a4);color:#111}
+.btn-o{background:transparent;color:var(--t2);border:1px solid var(--b2);border-radius:var(--r);padding:6px 12px;font-family:'Sora',sans-serif;font-size:11px;cursor:pointer;font-weight:500;transition:all .15s}
+.btn-o:hover{border-color:var(--a);color:var(--a)}
+.btn-danger{background:transparent;color:var(--danger);border:1px solid var(--danger);border-radius:var(--r);padding:4px 10px;font-size:10px;font-family:'Sora',sans-serif;cursor:pointer}
+.btn-grad{background:linear-gradient(135deg,var(--a),var(--a2));color:#fff;border:none;border-radius:var(--r);padding:10px 22px;font-family:'Sora',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:opacity .15s;width:100%;margin-top:.6rem}
+.btn-grad:hover{opacity:.9}
+.btn-print{background:var(--s2);color:var(--t2);border:1px solid var(--b2);border-radius:var(--r);padding:4px 10px;font-size:10px;font-family:'Sora',sans-serif;cursor:pointer;transition:all .15s}
+.btn-print:hover{color:var(--a2);border-color:var(--a2)}
+.delbtn{background:none;border:none;color:var(--t3);cursor:pointer;font-size:12px;padding:2px 4px;transition:color .15s}
+.delbtn:hover{color:var(--danger)}
+
+/* ======= CARDS ======= */
+.card{background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);padding:1rem;margin-bottom:.8rem}
+.card-sm{padding:.8rem}
+.ch{display:flex;align-items:center;justify-content:space-between;margin-bottom:.7rem}
+.slbl{font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:.5rem}
+
+/* ======= BANNER ======= */
+.bnr{background:linear-gradient(135deg,var(--s1) 0%,var(--s2) 100%);border:1px solid var(--b2);border-radius:var(--rl);padding:1rem 1.1rem;margin-bottom:.8rem;display:flex;align-items:center;gap:1rem;position:relative;overflow:hidden}
+.bnr::before{content:'';position:absolute;right:-15px;top:-15px;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle,rgba(14,165,233,.15) 0%,transparent 70%);pointer-events:none}
+.bav{width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:20px;flex-shrink:0;overflow:hidden;border:2px solid var(--b3)}
+.bav img{width:100%;height:100%;object-fit:cover}
+.binfo{flex:1}
+.bname{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;line-height:1.1}
+.bsub{font-size:10px;color:var(--t2);margin-top:2px}
+.bchips{display:flex;gap:3px;margin-top:5px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:9px;font-weight:700;letter-spacing:.3px;text-transform:uppercase}
+.ch-b{background:#1E3A5F;color:#60A5FA}.ch-t{background:#0F3330;color:#34D399}
+.ch-c{background:#3D1A1A;color:#F87171}.ch-p{background:#2D1A4D;color:#C084FC}
+.ch-y{background:#3D2E00;color:#FCD34D}.ch-s{background:var(--s3);color:var(--t2)}
+.bstats{display:flex;gap:.55rem;flex-shrink:0}
+.bst{text-align:center;background:var(--s3);border-radius:var(--r);padding:.5rem .7rem;min-width:60px}
+.bsv{font-family:'Bebas Neue',sans-serif;font-size:20px;line-height:1;color:var(--a)}
+.bsl{font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;margin-top:1px}
+
+/* ======= FORM ======= */
+.fg{display:grid;gap:8px;margin-bottom:.65rem}
+.fg2{grid-template-columns:1fr 1fr}
+.fg3{grid-template-columns:1fr 1fr 1fr}
+.fg4{grid-template-columns:1fr 1fr 1fr 1fr}
+.fgrp{display:flex;flex-direction:column;gap:3px}
+.fgrp label{font-size:9px;color:var(--t2);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.fgrp input,.fgrp select,.fgrp textarea{border:1px solid var(--b1);border-radius:var(--r);padding:7px 9px;font-size:12px;font-family:'Sora',sans-serif;color:var(--t1);background:var(--s2);outline:none;transition:border-color .15s}
+.fgrp input:focus,.fgrp select:focus,.fgrp textarea:focus{border-color:var(--a)}
+.fgrp select option{background:var(--s2)}
+.fgrp textarea{resize:vertical;min-height:56px;line-height:1.5}
+.fgrp input::placeholder,.fgrp textarea::placeholder{color:var(--t3)}
+
+/* ======= TABLE ======= */
+.tbl{width:100%;border-collapse:collapse;font-size:11px}
+.tbl th{font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:1px;padding:5px 9px;border-bottom:1px solid var(--b1);text-align:left;white-space:nowrap}
+.tbl td{padding:7px 9px;border-bottom:1px solid var(--b1);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--s2)}
+.tbw{overflow-x:auto}
+
+/* ======= STATUS PILLS ======= */
+.sp{display:inline-flex;align-items:center;padding:2px 7px;border-radius:20px;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}
+.sp-paid{background:#0F3330;color:#34D399}
+.sp-pending{background:#3D2E00;color:#FCD34D}
+.sp-overdue{background:#3D1A1A;color:#F87171}
+.sp-partial{background:#2D1A4D;color:#C084FC}
+.sp-present{background:#0F3330;color:#34D399}
+.sp-absent{background:#3D1A1A;color:#F87171}
+.sp-late{background:#3D2E00;color:#FCD34D}
+.sp-excused{background:#1E3A5F;color:#60A5FA}
+.sp-meet{background:#1E3A5F;color:#60A5FA}
+.sp-practice{background:var(--s3);color:var(--t2)}
+.sp-time_trial{background:#2D1A4D;color:#C084FC}
+
+/* ======= SCORE BARS ======= */
+.srow{display:flex;align-items:center;gap:7px;margin-bottom:.35rem}
+.slb{font-size:10px;flex:1;min-width:85px;color:var(--t2)}
+.str{flex:2;background:var(--s3);border-radius:20px;height:5px;overflow:hidden}
+.sf{height:5px;border-radius:20px;transition:width 1s ease}
+.sfg{background:linear-gradient(90deg,#10B981,#34D399)}
+.sfm{background:linear-gradient(90deg,#F59E0B,#FBBF24)}
+.sfr{background:linear-gradient(90deg,#EF4444,#F87171)}
+.sval{font-size:10px;font-weight:600;min-width:22px;text-align:right}
+
+/* ======= IMPROVE / DRILL ======= */
+.ii{display:flex;gap:8px;padding:.65rem;background:var(--s2);border-radius:var(--r);margin-bottom:5px;border-left:3px solid var(--a2)}
+.inum{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--a2);line-height:1;flex-shrink:0;width:18px}
+.ititle{font-size:11px;font-weight:600;margin-bottom:2px}
+.idesc{font-size:10px;color:var(--t2);line-height:1.5}
+.di{display:flex;gap:7px;padding:.6rem;background:var(--s2);border-radius:var(--r);margin-bottom:4px}
+.dnum{background:#3D2E00;color:#FCD34D;border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;margin-top:1px}
+.dn{font-size:11px;font-weight:600}
+.dm{font-size:10px;color:var(--t2);margin-top:1px}
+
+/* ======= WAVE LOADER ======= */
+.wave{display:flex;align-items:flex-end;justify-content:center;gap:3px;height:28px;margin-bottom:.55rem}
+.wave span{display:block;width:5px;border-radius:3px;background:var(--a);animation:wv 1s ease-in-out infinite}
+.wave span:nth-child(2){animation-delay:.12s}
+.wave span:nth-child(3){animation-delay:.24s}
+.wave span:nth-child(4){animation-delay:.36s}
+.wave span:nth-child(5){animation-delay:.48s}
+@keyframes wv{0%,100%{height:4px}50%{height:24px}}
+
+/* ======= HISTORY ======= */
+.hi{display:flex;align-items:flex-start;gap:9px;padding:.7rem;border-radius:var(--r);margin-bottom:5px;background:var(--s1);border:1px solid var(--b1);cursor:pointer;transition:all .15s}
+.hi:hover{border-color:var(--b2);background:var(--s2)}
+.hiscore{font-family:'Bebas Neue',sans-serif;font-size:26px;width:38px;text-align:center;flex-shrink:0;line-height:1}
+.hidate{font-size:9px;color:var(--t3);margin-bottom:2px}
+.hititle{font-size:11px;font-weight:500;margin-bottom:3px}
+.hitags{display:flex;flex-wrap:wrap;gap:2px}
+.tag{display:inline-flex;align-items:center;padding:2px 6px;border-radius:20px;font-size:9px;font-weight:500;margin:1px}
+.tag-d{background:#3D1A1A;color:#F87171}
+.tag-s{background:#0F3330;color:#34D399}
+
+/* ======= PB CARD ======= */
+.pbc{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:.6rem;position:relative;overflow:hidden}
+.pbc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--pb),transparent)}
+.pbev{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px}
+.pbtime{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--pb);line-height:1;margin:.15rem 0}
+.pbdt{font-size:9px;color:var(--t2)}
+.pbmt{font-size:9px;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ======= DASH STAT ======= */
+.dsc{background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);padding:.8rem;text-align:center}
+.dsbig{font-family:'Bebas Neue',sans-serif;font-size:34px;line-height:1}
+.dslbl{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+.dstrend{font-size:9px;margin-top:2px}
+.trup{color:#34D399}.trdn{color:#F87171}.trfl{color:var(--t3)}
+
+/* ======= CHART ======= */
+.cw{position:relative;height:200px}
+.cwlg{height:260px}
+.cwsm{height:155px}
+
+/* ======= PACKAGE CARD ======= */
+.pkgc{background:var(--s2);border:1px solid var(--b1);border-radius:var(--rl);padding:.9rem;cursor:pointer;transition:border-color .15s}
+.pkgc:hover{border-color:var(--b3)}
+.pkgc.sel{border-color:var(--a);background:rgba(14,165,233,.06)}
+.pkgprice{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--a);line-height:1;margin:.3rem 0}
+.pkgname{font-size:12px;font-weight:700}
+.pkgdesc{font-size:10px;color:var(--t2);margin-top:2px;line-height:1.4}
+.pkgdet{font-size:9px;color:var(--t3);margin-top:.4rem}
+
+/* ======= MODAL ======= */
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.76);z-index:500;align-items:center;justify-content:center;padding:1rem}
+.mo.open{display:flex}
+.md{background:var(--s1);border-radius:var(--rl);padding:1.35rem;max-width:510px;width:100%;max-height:92vh;overflow-y:auto;border:1px solid var(--b2)}
+.md-lg{max-width:760px}
+.mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.mttl{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px}
+.xbtn{background:none;border:none;font-size:17px;cursor:pointer;color:var(--t2);padding:3px;line-height:1}
+.xbtn:hover{color:var(--t1)}
+.md::-webkit-scrollbar{width:3px}
+.md::-webkit-scrollbar-thumb{background:var(--b2);border-radius:3px}
+
+/* ======= UPLOAD ======= */
+.upz{border:2px dashed var(--b2);border-radius:var(--rl);padding:1.5rem;text-align:center;cursor:pointer;transition:all .2s;background:var(--s2)}
+.upz:hover,.upz.drag{border-color:var(--a);background:rgba(14,165,233,.06)}
+.pimg{max-width:100%;border-radius:var(--r);margin-top:.55rem;max-height:200px;object-fit:cover}
+.pvid{width:100%;border-radius:var(--r);margin-top:.55rem;max-height:200px}
+
+/* ======= ANALYSIS TABS ======= */
+.atabs{display:flex;gap:4px;margin-bottom:.75rem;flex-wrap:wrap}
+.atab{padding:5px 11px;border-radius:var(--r);border:1px solid var(--b1);background:transparent;font-family:'Sora',sans-serif;font-size:10px;font-weight:500;cursor:pointer;color:var(--t2);transition:all .15s}
+.atab:hover{border-color:var(--a);color:var(--a)}
+.atab.act{background:var(--a);border-color:var(--a);color:#fff}
+
+/* ======= PHOTO UPLOAD ======= */
+.phup{width:60px;height:60px;border-radius:50%;border:2px dashed var(--b2);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;transition:border-color .15s;background:var(--s3);font-size:18px;color:var(--t3)}
+.phup:hover{border-color:var(--a)}
+.phup img{width:100%;height:100%;object-fit:cover}
+input[type=file]{display:none}
+
+/* ======= MISC ======= */
+.infobox{background:#0D1E3D;border:1px solid #1E3A6A;border-radius:var(--r);padding:.6rem .85rem;font-size:10px;color:#93C5FD;line-height:1.55;margin-bottom:.7rem}
+.empty{text-align:center;padding:1.75rem 1rem;color:var(--t2)}
+.eico{font-size:28px;margin-bottom:.45rem;display:block}
+.ettl{font-size:13px;font-weight:500;color:var(--t1);margin-bottom:.25rem}
+.esub{font-size:11px;line-height:1.5}
+.nosel{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:58vh;color:var(--t2);text-align:center;gap:.35rem}
+.nosel-ic{font-size:44px;margin-bottom:.4rem}
+.flex{display:flex;align-items:center}
+.flex-b{display:flex;align-items:center;justify-content:space-between}
+.gap{gap:6px}.gapsm{gap:4px}
+.mt{margin-top:.6rem}.mb{margin-bottom:.6rem}
+.hidden{display:none!important}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem}
+.dg{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:.55rem;margin-bottom:.75rem}
+.pbg{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.5rem}
+.pgg{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:.65rem;margin-bottom:.75rem}
+.tval{font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--a2);letter-spacing:.5px}
+.cw{position:relative;height:200px}
+.cwlg{position:relative;height:260px}
+.cwsm{position:relative;height:150px}
+/* ANALYSIS MODE TABS */
+.atab{padding:5px 11px;border-radius:var(--r);border:1px solid var(--b1);background:transparent;font-family:'Sora',sans-serif;font-size:10px;font-weight:500;cursor:pointer;color:var(--t2);transition:all .15s}
+.atab:hover{border-color:var(--a);color:var(--a)}
+.atab.act{background:var(--a);border-color:var(--a);color:#fff}
+.atabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:.75rem}
+/* UPLOAD ZONE */
+.upz{border:2px dashed var(--b2);border-radius:var(--rl);padding:1.5rem;text-align:center;cursor:pointer;transition:all .2s;background:var(--s2)}
+.upz:hover,.upz.drag{border-color:var(--a);background:rgba(14,165,233,.06)}
+.pimg{max-width:100%;border-radius:var(--r);margin-top:.55rem;max-height:200px;object-fit:cover}
+.pvid{width:100%;border-radius:var(--r);margin-top:.55rem;max-height:200px}
+/* PKG CARD */
+.pkgc{background:var(--s2);border:1px solid var(--b1);border-radius:var(--rl);padding:.9rem;cursor:pointer;transition:border-color .15s}
+.pkgc:hover{border-color:var(--b3)}
+.pkgprice{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--a);line-height:1;margin:.3rem 0}
+.pkgname{font-size:12px;font-weight:700}
+.pkgdesc{font-size:10px;color:var(--t2);margin-top:2px;line-height:1.4}
+.pkgdet{font-size:9px;color:var(--t3);margin-top:.4rem}
+/* DASH STAT */
+.dsc{background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);padding:.8rem;text-align:center}
+.dsbig{font-family:'Bebas Neue',sans-serif;font-size:34px;line-height:1}
+.dslbl{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+.dstrend{font-size:9px;margin-top:2px}
+.trup{color:#34D399}.trdn{color:#F87171}.trfl{color:var(--t3)}
+/* PB */
+.pbc{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:.6rem;position:relative;overflow:hidden}
+.pbc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--pb),transparent)}
+.pbev{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px}
+.pbtime{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--pb);line-height:1;margin:.2rem 0}
+.pbdt{font-size:9px;color:var(--t2)}.pbmt{font-size:9px;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ROLE VIS — toggled by JS */
+.adm-only,.cch-only{display:none}
+
+/* INVOICE PRINT */
+@media print{
+  body *{visibility:hidden}
+  #invoice-content,#invoice-content *{visibility:visible}
+  #invoice-content{position:fixed;top:0;left:0;width:100%;background:#fff;color:#000;padding:2rem;font-family:'Sora',sans-serif}
+}
+
+@media(max-width:700px){
+  .sb{display:none}
+  .bstats{display:none}
+  .fg3,.fg4{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="ls">
+  <div class="lbg"></div>
+  <div class="lcard">
+    <div class="llogo">SWIM<span>IQ</span></div>
+    <div class="lsub">Swim School Management · v3</div>
+    <div class="linp"><label>Username</label><input type="text" id="lu" placeholder="Enter username" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <div class="linp"><label>Password</label><input type="password" id="lp" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <button class="lbtn" onclick="doLogin()">Sign In →</button>
+    <div class="lerr" id="lerr"></div>
+    <div class="demobox">
+      <div class="demolbl">Demo Accounts — Click to fill</div>
+      <div class="dpills">
+        <span class="dp" style="background:#1E3A5F;color:#60A5FA;border-color:#2E4E7A" onclick="fl('admin','admin123')">👑 Admin</span>
+        <span class="dp" style="background:#0F3330;color:#34D399;border-color:#1A5048" onclick="fl('coach.nimal','coach123')">🏊 Coach</span>
+        <span class="dp" style="background:#2D1A4D;color:#C084FC;border-color:#4A2A7A" onclick="fl('kasun','kasun123')">🏅 Kasun</span>
+        <span class="dp" style="background:#2D1A4D;color:#C084FC;border-color:#4A2A7A" onclick="fl('amara','amara123')">🏅 Amara</span>
+        <span class="dp" style="background:#2D1A4D;color:#C084FC;border-color:#4A2A7A" onclick="fl('dilshan','dilshan123')">🏅 Dilshan</span>
+        <span class="dp" style="background:#3D2E00;color:#FCD34D;border-color:#5A4400" onclick="fl('parent.silva','parent123')">👪 Parent</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <!-- HEADER -->
+  <div class="hdr">
+    <div class="hdr-logo">SWIM<span>IQ</span></div>
+    <div class="hdr-sep"></div>
+    <div style="display:flex;flex-direction:column;gap:1px">
+      <div style="font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;line-height:1" id="hdr-school-name">Colombo Aquatics</div>
+      <div class="hdr-pg" id="hdr-pg">Dashboard</div>
+    </div>
+    <div class="hdr-r">
+      <button class="hbtn adm-only cch-only" onclick="expAll()">⬇ Export All</button>
+      <button class="hbtn adm-only cch-only" onclick="document.getElementById('impf').click()">⬆ Import</button>
+      <input type="file" id="impf" accept=".json" onchange="impData(event)">
+      <div class="uchip" onclick="doLogout()">
+        <div class="uav" id="huav"></div>
+        <div><div class="uname" id="hname">—</div><div class="rbadge" id="hrole">—</div></div>
+        <div style="font-size:9px;color:var(--t3);margin-left:2px" title="Logout">⇒</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="shell">
+    <!-- SIDEBAR -->
+    <aside class="sb">
+      <!-- School name header -->
+      <div style="padding:.6rem .8rem;border-bottom:1px solid var(--b1);background:var(--s2)">
+        <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:1px;font-weight:700">Swim School</div>
+        <div style="font-size:13px;font-weight:700;color:var(--t1);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="sb-school-name">Colombo Aquatics</div>
+      </div>
+      <div class="sb-search">
+        <span class="sb-si">🔍</span>
+        <input type="text" id="sbq" placeholder="Search athletes..." oninput="renderTree()">
+      </div>
+      <nav class="sb-nav">
+        <button class="nv act" onclick="goSec('dashboard')" id="nv-dashboard"><span class="nv-ic">📊</span>Dashboard</button>
+        <button class="nv" onclick="goSec('times')" id="nv-times"><span class="nv-ic">⏱</span>Times &amp; PBs</button>
+        <button class="nv" onclick="goSec('attendance')" id="nv-attendance"><span class="nv-ic">📅</span>Attendance</button>
+        <button class="nv" onclick="goSec('finance')" id="nv-finance"><span class="nv-ic">💳</span>Payments<span class="nbadge hidden" id="ovbadge">!</span></button>
+        <button class="nv adm-only cch-only" onclick="goSec('analysis')" id="nv-analysis"><span class="nv-ic">🏊</span>AI Analysis</button>
+        <button class="nv" onclick="goSec('history')" id="nv-history"><span class="nv-ic">📋</span>Reports</button>
+        <button class="nv adm-only cch-only" onclick="goSec('users')" id="nv-users"><span class="nv-ic">👥</span>Users</button>
+        <button class="nv adm-only" onclick="goSec('packages')" id="nv-packages"><span class="nv-ic">📦</span>Packages</button>
+      </nav>
+      <div class="sb-athletes">
+        <div class="sb-slbl">Athletes</div>
+        <div id="atree"></div>
+      </div>
+      <!-- Links to other SwimIQ tools -->
+      <div style="border-top:1px solid var(--b1);padding:.4rem">
+        <div style="font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:1.2px;padding:4px 8px 2px">SwimIQ Tools</div>
+        <a href="swimiq-modules.html" target="_blank" style="display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:var(--r);font-size:11px;font-weight:500;color:var(--t2);text-decoration:none;transition:all .15s" onmouseover="this.style.background='var(--s2)';this.style.color='var(--t1)'" onmouseout="this.style.background='';this.style.color='var(--t2)'">
+          <span style="font-size:13px;width:17px;text-align:center">🏆</span>Competition &amp; Training
+        </a>
+        <a href="swimiq-emails.html" target="_blank" style="display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:var(--r);font-size:11px;font-weight:500;color:var(--t2);text-decoration:none;transition:all .15s" onmouseover="this.style.background='var(--s2)';this.style.color='var(--t1)'" onmouseout="this.style.background='';this.style.color='var(--t2)'">
+          <span style="font-size:13px;width:17px;text-align:center">✉️</span>Email Templates
+        </a>
+        <a href="swimiq-landing.html" target="_blank" style="display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:var(--r);font-size:11px;font-weight:500;color:var(--t2);text-decoration:none;transition:all .15s" onmouseover="this.style.background='var(--s2)';this.style.color='var(--t1)'" onmouseout="this.style.background='';this.style.color='var(--t2)'">
+          <span style="font-size:13px;width:17px;text-align:center">🌐</span>Landing Page
+        </a>
+        <a href="swimiq-admin.html" target="_blank" style="display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:var(--r);font-size:11px;font-weight:500;color:var(--t2);text-decoration:none;transition:all .15s" onmouseover="this.style.background='var(--s2)';this.style.color='var(--t1)'" onmouseout="this.style.background='';this.style.color='var(--t2)'">
+          <span style="font-size:13px;width:17px;text-align:center">👑</span>Platform Admin
+        </a>
+      </div>
+      <button class="sb-addbtn" onclick="openAddA()" id="sb-add-athlete-btn" style="display:none">+ Add Athlete</button>
+    </aside>
+
+    <div class="main">
+
+      <!-- ===== DASHBOARD ===== -->
+      <div class="pg act" id="pg-dashboard">
+        <div class="tpbar"><div class="tp-ttl">Dashboard</div><div class="tp-act"><span id="dlbl" style="font-size:10px;color:var(--t2)"></span></div></div>
+        <div class="pw">
+          <div class="nosel" id="ns-dash"><span class="nosel-ic">🏊</span><div style="font-size:14px;font-weight:500;color:var(--t1)">Select an Athlete</div><div style="font-size:11px">Pick from the sidebar to view their full dashboard.</div></div>
+          <div id="dc" class="hidden">
+            <div id="db" class="bnr"></div>
+            <div class="dg" id="dstats"></div>
+            <div class="g2" style="margin-bottom:.75rem">
+              <div class="card card-sm"><div class="slbl">Analysis Score Trend</div><div class="cw"><canvas id="cst"></canvas></div></div>
+              <div class="card card-sm"><div class="slbl">100m Time Progression</div><div class="cw"><canvas id="ctt"></canvas></div></div>
+            </div>
+            <div class="g2" style="margin-bottom:.75rem">
+              <div class="card card-sm"><div class="slbl">Personal Bests 🥇</div><div class="pbg" id="dpbs"></div></div>
+              <div class="card card-sm">
+                <div class="slbl">Attendance Breakdown</div>
+                <div class="cwsm"><canvas id="cad"></canvas></div>
+                <div id="datt" style="display:flex;gap:8px;justify-content:center;margin-top:.4rem;flex-wrap:wrap"></div>
+              </div>
+            </div>
+            <div class="card card-sm"><div class="ch"><div class="slbl" style="margin:0">Latest Analysis Report</div><button class="btn btn-sm" onclick="goSec('history')">All Reports →</button></div><div id="dlat"></div></div>
+            <div class="card card-sm adm-only cch-only" id="dfin"><div class="slbl">Payment Status</div><div id="dfp"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== TIMES ===== -->
+      <div class="pg" id="pg-times">
+        <div class="tpbar"><div class="tp-ttl">Times &amp; Records</div></div>
+        <div class="pw">
+          <div class="nosel" id="ns-times"><span class="nosel-ic">⏱</span><div style="font-size:14px;font-weight:500;color:var(--t1)">Select an Athlete</div></div>
+          <div id="tc" class="hidden">
+            <div id="tb" class="bnr"></div>
+            <!-- Line chart: one line per stroke -->
+            <div class="card card-sm mb"><div class="slbl">Time Progression by Stroke — 100m (Line Chart)</div><div class="cwlg"><canvas id="ctl"></canvas></div></div>
+            <!-- PBs -->
+            <div class="card card-sm mb"><div class="slbl">Personal Bests</div><div class="pbg" id="pbgrid"></div></div>
+            <!-- Log form -->
+            <div class="card card-sm mb" id="log-time-card">
+              <div class="slbl">Log New Time</div>
+              <div class="fg fg3">
+                <div class="fgrp"><label>Date</label><input type="date" id="tr-date"></div>
+                <div class="fgrp"><label>Type</label><select id="tr-type"><option value="practice">Practice</option><option value="meet">Meet</option><option value="time_trial">Time Trial</option></select></div>
+                <div class="fgrp"><label>Stroke</label><select id="tr-stroke"><option>Freestyle</option><option>Butterfly</option><option>Backstroke</option><option>Breaststroke</option><option>IM</option></select></div>
+              </div>
+              <div class="fg fg4">
+                <div class="fgrp"><label>Distance (m)</label><select id="tr-dist"><option value="50">50m</option><option value="100" selected>100m</option><option value="200">200m</option><option value="400">400m</option><option value="800">800m</option><option value="1500">1500m</option></select></div>
+                <div class="fgrp"><label>Pool Length</label><select id="tr-pool"><option value="50">50m LCM</option><option value="25">25m SCM</option></select></div>
+                <div class="fgrp"><label>Time (m:ss.00)</label><input type="text" id="tr-time" placeholder="e.g. 58.30"></div>
+                <div class="fgrp"><label>Meet Name</label><input type="text" id="tr-meet" placeholder="optional"></div>
+              </div>
+              <div class="fg fg2">
+                <div class="fgrp"><label>Notes</label><input type="text" id="tr-notes" placeholder="optional"></div>
+                <div style="display:flex;align-items:flex-end"><button class="btn btn-g btn-sm" onclick="logTime()" style="height:33px;width:100%">+ Log Time</button></div>
+              </div>
+            </div>
+            <!-- Table -->
+            <div class="card card-sm">
+              <div class="flex-b mb">
+                <div class="slbl" style="margin:0">All Records</div>
+                <div class="flex gap">
+                  <select id="tf-s" onchange="renderTimesTable()" style="font-size:10px;padding:3px 7px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);color:var(--t1);font-family:'Sora',sans-serif"><option value="">All Strokes</option><option>Freestyle</option><option>Butterfly</option><option>Backstroke</option><option>Breaststroke</option><option>IM</option></select>
+                  <select id="tf-t" onchange="renderTimesTable()" style="font-size:10px;padding:3px 7px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);color:var(--t1);font-family:'Sora',sans-serif"><option value="">All Types</option><option value="meet">Meet</option><option value="practice">Practice</option><option value="time_trial">Trial</option></select>
+                </div>
+              </div>
+              <div class="tbw"><table class="tbl"><thead><tr><th>Date</th><th>Type</th><th>Event</th><th>Pool</th><th>Time</th><th>Meet</th><th>Notes</th><th id="tr-del-col"></th></tr></thead><tbody id="ttb"></tbody></table></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== ATTENDANCE ===== -->
+      <div class="pg" id="pg-attendance">
+        <div class="tpbar"><div class="tp-ttl">Attendance</div><div class="tp-act adm-only cch-only"><button class="btn" onclick="openMarkAtt()">+ Mark Session</button></div></div>
+        <div class="pw">
+          <div class="nosel" id="ns-att"><span class="nosel-ic">📅</span><div style="font-size:14px;font-weight:500;color:var(--t1)">Select an Athlete</div></div>
+          <div id="ac" class="hidden">
+            <div id="ab" class="bnr"></div>
+            <div class="g2" style="margin-bottom:.75rem">
+              <div class="card card-sm"><div class="slbl">Overall Attendance Rate</div><div class="cw"><canvas id="car"></canvas></div></div>
+              <div class="card card-sm"><div class="slbl">Monthly Breakdown</div><div class="cw"><canvas id="cam"></canvas></div></div>
+            </div>
+            <div class="card card-sm">
+              <div class="slbl">Session Log</div>
+              <div class="tbw"><table class="tbl"><thead><tr><th>Date</th><th>Slot</th><th>Time</th><th>Focus</th><th>Status</th><th>Note</th><th class="adm-only cch-only">Edit</th></tr></thead><tbody id="atb"></tbody></table></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== FINANCE ===== -->
+      <div class="pg" id="pg-finance">
+        <div class="tpbar">
+          <div class="tp-ttl">Payments &amp; Packages</div>
+          <div class="tp-act adm-only cch-only">
+            <button class="btn" onclick="openPayModal()">+ Record Payment</button>
+            <button class="btn-o" onclick="openEnrollModal()">Enroll Package</button>
+          </div>
+        </div>
+        <div class="pw">
+          <div class="nosel" id="ns-fin"><span class="nosel-ic">💳</span><div style="font-size:14px;font-weight:500;color:var(--t1)">Select an Athlete</div></div>
+          <div id="fc" class="hidden">
+            <div id="fb" class="bnr"></div>
+            <div class="card card-sm mb">
+              <div class="slbl">Current Package &amp; Enrollment</div>
+              <div id="fpkg"></div>
+            </div>
+            <div class="g2" style="margin-bottom:.75rem">
+              <div class="card card-sm"><div class="slbl">Monthly Revenue Collected</div><div class="cw"><canvas id="crev"></canvas></div></div>
+              <div class="card card-sm"><div class="slbl">Payment Summary</div><div id="fsum"></div></div>
+            </div>
+            <div class="card card-sm">
+              <div class="flex-b mb">
+                <div class="slbl" style="margin:0">Payment History</div>
+                <button class="btn-print adm-only cch-only" onclick="printInvoice()">🖨 Print Invoice</button>
+              </div>
+              <div class="tbw"><table class="tbl"><thead><tr><th>Month</th><th>Amount</th><th>Due Date</th><th>Paid On</th><th>Method</th><th>Status</th><th>Receipt</th><th class="adm-only cch-only">Actions</th></tr></thead><tbody id="ftb"></tbody></table></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== ANALYSIS ===== -->
+      <div class="pg" id="pg-analysis">
+        <div class="tpbar">
+          <div class="tp-ttl">Analysis</div>
+          <div class="tp-act">
+            <button class="atab act" id="an-mode-ai" onclick="switchAnMode('ai')" style="padding:5px 12px">🤖 AI Analysis</button>
+            <button class="atab" id="an-mode-manual" onclick="switchAnMode('manual')" style="padding:5px 12px">✍️ Manual Entry</button>
+          </div>
+        </div>
+        <div class="pw">
+          <div class="nosel" id="ns-an"><span class="nosel-ic">🏊</span><div style="font-size:14px;font-weight:500;color:var(--t1)">Select an Athlete</div></div>
+          <div id="anc" class="hidden">
+            <div id="anb" class="bnr"></div>
+
+            <!-- AI MODE -->
+            <div id="an-ai-panel">
+              <div class="infobox">⚡ <strong>AI Powered.</strong> Add your Anthropic API key for live video/image analysis. Without a key, a detailed demo report is generated automatically.</div>
+              <div class="card card-sm mb"><div class="fgrp"><label>Anthropic API Key (optional)</label><input id="api-key" type="password" placeholder="sk-ant-api03-..."></div></div>
+              <div class="card card-sm mb">
+                <div class="slbl">Analysis Type</div>
+                <div class="atabs">
+                  <button class="atab act" id="atab-stroke" onclick="setAT('stroke')">🏊 Stroke Technique</button>
+                  <button class="atab" id="atab-start" onclick="setAT('start')">🏁 Start / Dive</button>
+                  <button class="atab" id="atab-turn" onclick="setAT('turn')">🔄 Turns &amp; Walls</button>
+                  <button class="atab" id="atab-full" onclick="setAT('full')">📋 Full Race</button>
+                </div>
+              </div>
+              <div class="card card-sm mb">
+                <div class="upz" id="upz" onclick="document.getElementById('ffile').click()" ondragover="onDrag(event)" ondrop="onDrop(event)" ondragleave="offDrag()">
+                  <div style="font-size:28px;margin-bottom:.35rem">🎬</div>
+                  <div style="font-size:12px;font-weight:600;margin-bottom:.2rem">Drop video / image or click to upload</div>
+                  <div style="font-size:10px;color:var(--t2)">MP4, MOV, JPG, PNG supported</div>
+                </div>
+                <input type="file" id="ffile" accept="video/*,image/*" onchange="handleFile(event)">
+                <div id="prev-area" class="hidden">
+                  <img id="iprev" class="pimg hidden" alt="">
+                  <video id="vprev" class="pvid hidden" controls></video>
+                  <div class="flex-b mt gapsm"><span id="fname" style="font-size:10px;color:var(--t2)"></span><button class="btn-o btn-sm" onclick="clearFile()">Clear</button></div>
+                </div>
+                <div class="fgrp mt"><label>Coach Notes (optional)</label><textarea id="an-notes" placeholder="Focus areas, race context, fatigue level..."></textarea></div>
+                <button class="btn-grad" onclick="runAnalysis()">Analyze with AI →</button>
+              </div>
+            </div>
+
+            <!-- MANUAL MODE -->
+            <div id="an-manual-panel" style="display:none">
+              <div class="infobox">✍️ <strong>Manual Entry.</strong> Enter your own technique scores and observations. No AI or video required — ideal for poolside coaching notes.</div>
+              <div class="card card-sm mb">
+                <div class="slbl">Analysis Type</div>
+                <div class="atabs">
+                  <button class="atab act" id="matab-stroke" onclick="setMAT('stroke')">🏊 Stroke</button>
+                  <button class="atab" id="matab-start" onclick="setMAT('start')">🏁 Start</button>
+                  <button class="atab" id="matab-turn" onclick="setMAT('turn')">🔄 Turns</button>
+                  <button class="atab" id="matab-full" onclick="setMAT('full')">📋 Full Race</button>
+                </div>
+              </div>
+              <div class="card card-sm mb">
+                <div class="fg fg2" style="margin-bottom:.75rem">
+                  <div class="fgrp"><label>Overall Score (0–100)</label><input type="number" id="m-score" min="0" max="100" placeholder="72"></div>
+                  <div class="fgrp"><label>Date</label><input type="date" id="m-date"></div>
+                </div>
+                <div class="fgrp mb"><label>Summary / Observations</label><textarea id="m-summary" placeholder="Brief summary of the session..."></textarea></div>
+                <div class="slbl">Technique Scores (0–100)</div>
+                <div id="m-scores-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:.75rem"></div>
+                <div class="slbl">Weaknesses (one per line)</div>
+                <textarea class="fgrp" style="width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:7px 9px;font-size:12px;font-family:'Sora',sans-serif;color:var(--t1);outline:none;resize:vertical;min-height:72px;margin-bottom:.65rem" id="m-weaknesses" placeholder="Head position too high&#10;Crossover on hand entry"></textarea>
+                <div class="slbl">Strengths (one per line)</div>
+                <textarea style="width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:7px 9px;font-size:12px;font-family:'Sora',sans-serif;color:var(--t1);outline:none;resize:vertical;min-height:56px;margin-bottom:.65rem" id="m-strengths" placeholder="Two-beat kick&#10;Good bilateral breathing"></textarea>
+                <div class="slbl">Improvement Tips (title | description, one per line)</div>
+                <textarea style="width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:7px 9px;font-size:12px;font-family:'Sora',sans-serif;color:var(--t1);outline:none;resize:vertical;min-height:72px;margin-bottom:.65rem" id="m-improvements" placeholder="High-Elbow Catch | Fingertips down, elbow high and forward.&#10;Hip Rotation | Rotate hips 45° with each stroke."></textarea>
+                <div class="slbl">Corrective Drills (drill | reps | focus, one per line)</div>
+                <textarea style="width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:7px 9px;font-size:12px;font-family:'Sora',sans-serif;color:var(--t1);outline:none;resize:vertical;min-height:72px;margin-bottom:.75rem" id="m-drills" placeholder="Catch-up drill | 6×50m | Corrects crossover&#10;Fist drill | 4×100m | High-elbow feel"></textarea>
+                <button class="btn-grad" onclick="saveManualAnalysis()">Save Manual Analysis →</button>
+              </div>
+            </div>
+
+            <div id="an-out"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== HISTORY ===== -->
+      <div class="pg" id="pg-history">
+        <div class="tpbar"><div class="tp-ttl">Analysis Reports</div></div>
+        <div class="pw">
+          <div class="nosel" id="ns-hist"><span class="nosel-ic">📋</span><div style="font-size:14px;font-weight:500;color:var(--t1)">Select an Athlete</div></div>
+          <div id="hc" class="hidden">
+            <div id="hb" class="bnr"></div>
+            <div class="card card-sm mb">
+              <div class="slbl">Technique Score Trend — All Dimensions (Multi-Line)</div>
+              <div class="cwlg"><canvas id="csh"></canvas></div>
+            </div>
+            <div class="card card-sm"><div class="slbl">All Analysis Sessions</div><div id="hlist"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== USERS ===== -->
+      <div class="pg" id="pg-users">
+        <div class="tpbar"><div class="tp-ttl">User Management</div><div class="tp-act"><button class="btn" onclick="openAddUser()">+ Add User</button></div></div>
+        <div class="pw">
+          <div class="card card-sm">
+            <div class="tbw"><table class="tbl"><thead><tr><th>Name</th><th>Username</th><th>Role</th><th>Email</th><th>Linked Athlete(s)</th><th>Status</th><th>Actions</th></tr></thead><tbody id="utb"></tbody></table></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== PACKAGES ===== -->
+      <div class="pg" id="pg-packages">
+        <div class="tpbar"><div class="tp-ttl">Packages &amp; Pricing</div><div class="tp-act"><button class="btn" onclick="openAddPkg()">+ Add Package</button></div></div>
+        <div class="pw">
+          <div class="card card-sm mb"><div class="slbl">Revenue by Package</div><div class="cw"><canvas id="crv"></canvas></div></div>
+          <div class="pgg" id="pkggrid"></div>
+        </div>
+      </div>
+
+    </div><!-- /main -->
+  </div><!-- /shell -->
+</div><!-- /app -->
+
+<!-- MODALS -->
+<!-- Athlete -->
+<div class="mo" id="mo-athlete">
+  <div class="md">
+    <div class="mh"><div class="mttl" id="mo-a-title">Add Athlete</div><button class="xbtn" onclick="closeM('mo-athlete')">✕</button></div>
+    <div class="flex gap mb" style="gap:12px">
+      <div class="phup" id="phup" onclick="document.getElementById('ph-file').click()">📷</div>
+      <input type="file" id="ph-file" accept="image/*" onchange="handlePhoto(event)">
+      <div style="flex:1">
+        <div class="fg fg2">
+          <div class="fgrp" style="grid-column:1/-1"><label>Full Name *</label><input id="f-name" placeholder="Full name"></div>
+          <div class="fgrp"><label>Date of Birth *</label><input type="date" id="f-dob" onchange="calcAge()"></div>
+          <div class="fgrp"><label>Age</label><div style="font-size:12px;color:var(--a);font-weight:500;padding:7px 9px;border:1px solid var(--b1);border-radius:var(--r);background:var(--s3)" id="agedp">—</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="fg fg3">
+      <div class="fgrp"><label>Primary Stroke</label><select id="f-stroke"><option>Freestyle</option><option>Butterfly</option><option>Backstroke</option><option>Breaststroke</option><option>IM</option></select></div>
+      <div class="fgrp"><label>Level</label><select id="f-level"><option>Beginner</option><option>Intermediate</option><option>Advanced</option><option>Elite</option></select></div>
+      <div class="fgrp"><label>Gender</label><select id="f-gender"><option>Male</option><option>Female</option><option>Other</option></select></div>
+    </div>
+    <div class="fg fg2">
+      <div class="fgrp"><label>Club / Team</label><input id="f-club" placeholder="Club name"></div>
+      <div class="fgrp"><label>Email</label><input type="email" id="f-email" placeholder="email"></div>
+    </div>
+    <div class="fg fg2">
+      <div class="fgrp"><label>Phone</label><input id="f-phone" placeholder="+94 ..."></div>
+      <div class="fgrp"><label>Emergency Contact</label><input id="f-emergency" placeholder="Name &amp; phone"></div>
+    </div>
+    <div class="fg">
+      <div class="fgrp"><label>Goals</label><textarea id="f-goals" placeholder="Training goals..."></textarea></div>
+      <div class="fgrp"><label>Coach Notes</label><textarea id="f-notes" placeholder="Internal notes..."></textarea></div>
+    </div>
+    <div class="flex-b mt">
+      <button class="btn-danger hidden" id="del-a-btn" onclick="delAthlete()">🗑 Delete Athlete</button>
+      <div class="flex gap"><button class="btn-o btn-sm" onclick="closeM('mo-athlete')">Cancel</button><button class="btn btn-sm" onclick="saveAthlete()">Save</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- Attendance -->
+<div class="mo" id="mo-att">
+  <div class="md md-lg">
+    <div class="mh"><div class="mttl">Mark Session Attendance</div><button class="xbtn" onclick="closeM('mo-att')">✕</button></div>
+    <div class="fg fg3">
+      <div class="fgrp"><label>Date</label><input type="date" id="att-date"></div>
+      <div class="fgrp"><label>Slot</label><select id="att-slot"><option>Morning</option><option>Afternoon</option><option>Evening</option></select></div>
+      <div class="fgrp"><label>Time</label><input type="text" id="att-time" placeholder="06:00–08:00"></div>
+    </div>
+    <div class="fg fg2">
+      <div class="fgrp"><label>Coach</label><input type="text" id="att-coach" placeholder="Coach name"></div>
+      <div class="fgrp"><label>Session Focus</label><input type="text" id="att-focus" placeholder="e.g. Stroke Technique"></div>
+    </div>
+    <div class="slbl mt">Athlete Attendance</div>
+    <div id="att-rows"></div>
+    <div class="flex-b mt"><div></div><div class="flex gap"><button class="btn-o btn-sm" onclick="closeM('mo-att')">Cancel</button><button class="btn btn-sm" onclick="saveAtt()">Save Session</button></div></div>
+  </div>
+</div>
+
+<!-- Payment -->
+<div class="mo" id="mo-pay">
+  <div class="md">
+    <div class="mh"><div class="mttl">Record Payment</div><button class="xbtn" onclick="closeM('mo-pay')">✕</button></div>
+    <div class="fg fg2">
+      <div class="fgrp"><label>Package</label><select id="py-pkg"></select></div>
+      <div class="fgrp"><label>Month / Period</label><input type="text" id="py-month" placeholder="e.g. April 2026"></div>
+    </div>
+    <div class="fg fg3">
+      <div class="fgrp"><label>Amount (LKR)</label><input type="number" id="py-amt" placeholder="14000"></div>
+      <div class="fgrp"><label>Due Date</label><input type="date" id="py-due"></div>
+      <div class="fgrp"><label>Paid Date</label><input type="date" id="py-paid"></div>
+    </div>
+    <div class="fg fg2">
+      <div class="fgrp"><label>Payment Method</label><select id="py-method"><option>Cash</option><option>Bank Transfer</option><option>Online</option><option>Cheque</option></select></div>
+      <div class="fgrp"><label>Status</label><select id="py-status"><option value="paid">Paid</option><option value="pending">Pending</option><option value="overdue">Overdue</option><option value="partial">Partial</option></select></div>
+    </div>
+    <div class="fgrp mb"><label>Notes</label><input type="text" id="py-notes" placeholder="optional"></div>
+    <div class="flex-b mt"><div></div><div class="flex gap"><button class="btn-o btn-sm" onclick="closeM('mo-pay')">Cancel</button><button class="btn btn-g btn-sm" onclick="savePay()">Save Payment</button></div></div>
+  </div>
+</div>
+
+<!-- Enroll Package -->
+<div class="mo" id="mo-enroll">
+  <div class="md">
+    <div class="mh"><div class="mttl">Enroll in Package</div><button class="xbtn" onclick="closeM('mo-enroll')">✕</button></div>
+    <div class="slbl">Select Package</div>
+    <div class="pgg" id="enroll-pkgs" style="margin-bottom:.85rem"></div>
+    <div class="fg fg2">
+      <div class="fgrp"><label>Start Date</label><input type="date" id="enr-start"></div>
+      <div class="fgrp"><label>End Date</label><input type="date" id="enr-end"></div>
+    </div>
+    <div class="fgrp mb"><label>Auto Renew</label><select id="enr-auto"><option value="1">Yes</option><option value="0">No</option></select></div>
+    <div class="flex-b mt"><div></div><div class="flex gap"><button class="btn-o btn-sm" onclick="closeM('mo-enroll')">Cancel</button><button class="btn btn-sm" onclick="saveEnroll()">Enroll</button></div></div>
+  </div>
+</div>
+
+<!-- Package -->
+<div class="mo" id="mo-pkg">
+  <div class="md">
+    <div class="mh"><div class="mttl" id="mo-p-title">Add Package</div><button class="xbtn" onclick="closeM('mo-pkg')">✕</button></div>
+    <div class="fg">
+      <div class="fgrp"><label>Package Name</label><input id="pk-name" placeholder="e.g. Elite Monthly"></div>
+      <div class="fgrp"><label>Description</label><input id="pk-desc" placeholder="Brief description..."></div>
+    </div>
+    <div class="fg fg3">
+      <div class="fgrp"><label>Price (LKR)</label><input type="number" id="pk-price" placeholder="14000"></div>
+      <div class="fgrp"><label>Sessions / Week</label><input type="number" id="pk-spw" placeholder="5"></div>
+      <div class="fgrp"><label>Duration (Months)</label><input type="number" id="pk-dur" placeholder="1"></div>
+    </div>
+    <div class="flex-b mt"><div></div><div class="flex gap"><button class="btn-o btn-sm" onclick="closeM('mo-pkg')">Cancel</button><button class="btn btn-sm" onclick="savePkg()">Save Package</button></div></div>
+  </div>
+</div>
+
+<!-- User -->
+<div class="mo" id="mo-user">
+  <div class="md">
+    <div class="mh"><div class="mttl" id="mo-u-title">Add User</div><button class="xbtn" onclick="closeM('mo-user')">✕</button></div>
+    <div class="fg fg2">
+      <div class="fgrp"><label>Full Name</label><input id="u-name" placeholder="Full name"></div>
+      <div class="fgrp"><label>Username</label><input id="u-un" placeholder="login username"></div>
+    </div>
+    <div class="fg fg2">
+      <div class="fgrp"><label>Password</label><input type="password" id="u-pw" placeholder="password"></div>
+      <div class="fgrp"><label>Role</label><select id="u-role"><option value="admin">Admin</option><option value="coach">Coach</option><option value="athlete">Athlete</option><option value="parent">Parent</option></select></div>
+    </div>
+    <div class="fg fg2">
+      <div class="fgrp"><label>Email</label><input type="email" id="u-email" placeholder="email"></div>
+      <div class="fgrp"><label>Phone</label><input id="u-phone" placeholder="+94 ..."></div>
+    </div>
+    <div class="fgrp mb"><label>Linked Athlete (Athlete/Parent role)</label><select id="u-athl"><option value="">— None —</option></select></div>
+    <div class="flex-b mt"><button class="btn-danger hidden" id="del-u-btn" onclick="delUser()">🗑 Delete</button><div class="flex gap"><button class="btn-o btn-sm" onclick="closeM('mo-user')">Cancel</button><button class="btn btn-sm" onclick="saveUser()">Save User</button></div></div>
+  </div>
+</div>
+
+<!-- Report Detail -->
+<div class="mo" id="mo-report">
+  <div class="md md-lg">
+    <div class="mh"><div class="mttl" id="rep-title">Report</div><button class="xbtn" onclick="closeM('mo-report')">✕</button></div>
+    <div id="rep-body"></div>
+  </div>
+</div>
+
+<!-- Invoice Print Area (hidden) -->
+<div id="invoice-content" style="display:none"></div>
+
+<script>
+// ============================================================
+// DATA STORES & KEYS
+// ============================================================
+const K={d:'siq3d',t:'siq3t',u:'siq3u',a:'siq3a',f:'siq3f'};
+let DB={athletes:[],analyses:[]};
+let TDB={records:[]};
+let UDB={users:[]};
+let ADB={sessions:[]};
+let FDB={packages:[],enrollments:[],payments:[]};
+
+let CU=null; // current user
+let SA=null; // selected athlete id
+let CS='dashboard'; // current section
+let AT='stroke'; // analysis type
+let CF=null; // current file
+let PP=null; // pending photo
+let EAid=null; // editing athlete id
+let EUid=null; // editing user id
+let EPid=null; // editing package id
+let selectedEnrollPkg=null;
+let CHS={}; // chart instances
+
+const COLORS=['blue','teal','coral','purple'];
+const ABG={blue:'#1E3A5F',teal:'#0F3330',coral:'#3D1A1A',purple:'#2D1A4D'};
+const ATX={blue:'#60A5FA',teal:'#34D399',coral:'#F87171',purple:'#C084FC'};
+const LDOT={Beginner:'#3D5F80',Intermediate:'#34D399',Advanced:'#60A5FA',Elite:'#F87171'};
+
+// ============================================================
+// STORAGE
+// ============================================================
+function loadAll(){
+  try{const r=localStorage.getItem(K.d);if(r)DB=JSON.parse(r);}catch(e){}
+  try{const r=localStorage.getItem(K.t);if(r)TDB=JSON.parse(r);}catch(e){}
+  try{const r=localStorage.getItem(K.u);if(r)UDB=JSON.parse(r);}catch(e){}
+  try{const r=localStorage.getItem(K.a);if(r)ADB=JSON.parse(r);}catch(e){}
+  try{const r=localStorage.getItem(K.f);if(r)FDB=JSON.parse(r);}catch(e){}
+  if(!DB.athletes||!DB.athletes.length)seedDB();
+  if(!TDB.records||!TDB.records.length)seedTimes();
+  if(!UDB.users||!UDB.users.length)seedUsers();
+  if(!ADB.sessions||!ADB.sessions.length)seedAtt();
+  if(!FDB.packages||!FDB.packages.length)seedFin();
+}
+function sDB(){try{localStorage.setItem(K.d,JSON.stringify(DB));}catch(e){}}
+function sTDB(){try{localStorage.setItem(K.t,JSON.stringify(TDB));}catch(e){}}
+function sUDB(){try{localStorage.setItem(K.u,JSON.stringify(UDB));}catch(e){}}
+function sADB(){try{localStorage.setItem(K.a,JSON.stringify(ADB));}catch(e){}}
+function sFDB(){try{localStorage.setItem(K.f,JSON.stringify(FDB));}catch(e){}}
+
+// ============================================================
+// SEED DATA
+// ============================================================
+function seedDB(){
+  DB={athletes:[
+    {id:1,name:'Kasun Silva',dob:'2007-03-14',stroke:'Freestyle',level:'Advanced',club:'Colombo Aquatics',goals:'Improve flip turns and stroke rate',color:'blue',initials:'KS',gender:'Male',photo:null,email:'kasun@email.com',phone:'+94 76 345 6789',emergencyContact:'Sunil Silva +94 77 678 9012',notes:'Strong kick, needs catch mechanics work'},
+    {id:2,name:'Amara Jayawardena',dob:'2010-07-22',stroke:'Butterfly',level:'Intermediate',club:'Kandy Swim Club',goals:'Strengthen pullout and reduce drag',color:'teal',initials:'AJ',gender:'Female',photo:null,email:'amara@email.com',phone:'',emergencyContact:'',notes:'Good block reaction'},
+    {id:3,name:'Dilshan Fernando',dob:'2003-11-05',stroke:'Breaststroke',level:'Elite',club:'National Team',goals:'Olympic qualifier preparation',color:'coral',initials:'DF',gender:'Male',photo:null,email:'dilshan@email.com',phone:'',emergencyContact:'',notes:'Elite mechanics. Focus on race pacing.'}
+  ],analyses:[
+    {id:1,athleteId:1,date:'2026-03-15',score:72,type:'stroke',typeLabel:'Stroke Technique',title:'Freestyle — Stroke Technique',summary:'Kasun shows solid advanced freestyle with identifiable areas for improvement in catch mechanics and body alignment.',techniqueScores:[{name:'Body Position',score:74},{name:'Catch Mechanics',score:61},{name:'Kick Technique',score:80},{name:'Breathing',score:70},{name:'Stroke Timing',score:73},{name:'Hip Rotation',score:69}],weaknesses:['Head position too high','Crossover on hand entry','Short catch'],strengths:['Consistent two-beat kick','Good bilateral breathing'],improvements:[{title:'Neutral Head Alignment',desc:'Keep ears between arms. Only the mouth clears the water to breathe.'},{title:'High-Elbow Catch',desc:'Fingertips down, elbow high. Engages lats for max propulsion.'}],fixWorkouts:[{drill:'Catch-up drill',reps:'6×50m',focus:'Corrects crossover'},{drill:'Fist drill',reps:'4×100m',focus:'High-elbow feel'},{drill:'6-3-6 rotation',reps:'4×75m',focus:'Hip rotation timing'}]},
+    {id:2,athleteId:1,date:'2026-02-20',score:68,type:'stroke',typeLabel:'Stroke Technique',title:'Freestyle — Stroke Technique',summary:'Early session. Catch and hip rotation issues identified.',techniqueScores:[{name:'Body Position',score:70},{name:'Catch Mechanics',score:55},{name:'Kick Technique',score:76},{name:'Breathing',score:65},{name:'Stroke Timing',score:68},{name:'Hip Rotation',score:64}],weaknesses:['Short catch','Flat body position'],strengths:['Two-beat kick'],improvements:[{title:'High-Elbow Catch',desc:'Focus on forearm anchor.'}],fixWorkouts:[{drill:'Fist drill',reps:'4×100m',focus:'Catch feel'}]},
+    {id:3,athleteId:2,date:'2026-03-10',score:65,type:'start',typeLabel:'Start / Dive',title:'Butterfly — Start & Dive',summary:'Good block reaction but needs entry angle and underwater phase work.',techniqueScores:[{name:'Block Reaction',score:78},{name:'Take-off Angle',score:55},{name:'Entry Position',score:60},{name:'Underwater Kick',score:58},{name:'Breakout Timing',score:63},{name:'First Stroke',score:71}],weaknesses:['Shallow dive angle','Short underwater phase'],strengths:['Block reaction time','Tight streamline'],improvements:[{title:'Entry Angle 35–40°',desc:'Drive hips forward on take-off.'},{title:'Extend Dolphin Kicks',desc:'Target 7–9 kicks before breakout.'}],fixWorkouts:[{drill:'Target angle dives',reps:'10×dive',focus:'Entry angle'},{drill:'Dolphin kick sets',reps:'10×25m',focus:'Underwater endurance'}]},
+    {id:4,athleteId:3,date:'2026-03-20',score:88,type:'stroke',typeLabel:'Stroke Technique',title:'Breaststroke — Stroke Technique',summary:'Elite mechanics. Minor glide timing adjustment needed.',techniqueScores:[{name:'Pullout Mechanics',score:93},{name:'Arm Pull Timing',score:85},{name:'Kick Width',score:90},{name:'Glide Phase',score:78},{name:'Head Position',score:88},{name:'Cycle Tempo',score:86}],weaknesses:['Glide phase cut short'],strengths:['Pullout — exceptional','Kick width & snap'],improvements:[{title:'Hold the Glide',desc:"Count 'one-thousand' before the pull. 0.3s longer glide reduces drag."}],fixWorkouts:[{drill:'2-kick 1-pull',reps:'6×50m',focus:'Forces longer glide'}]},
+    {id:5,athleteId:3,date:'2026-02-10',score:84,type:'stroke',typeLabel:'Stroke Technique',title:'Breaststroke — Stroke Technique',summary:'Strong session, high marks across the board.',techniqueScores:[{name:'Pullout Mechanics',score:89},{name:'Arm Pull Timing',score:82},{name:'Kick Width',score:87},{name:'Glide Phase',score:72},{name:'Head Position',score:85},{name:'Cycle Tempo',score:83}],weaknesses:['Glide phase'],strengths:['Pullout','Kick width'],improvements:[{title:'Hold the Glide',desc:'Extend the glide phase.'}],fixWorkouts:[{drill:'Timing sets',reps:'8×50m',focus:'Glide count'}]}
+  ]};sDB();
+}
+function seedTimes(){TDB={records:[{id:101,athleteId:1,date:'2026-03-20',type:'practice',stroke:'Freestyle',distance:100,poolLength:50,time:58.42,isPB:false,meetName:'',notes:'Morning session'},{id:102,athleteId:1,date:'2026-03-10',type:'meet',stroke:'Freestyle',distance:100,poolLength:50,time:57.88,isPB:true,meetName:'Colombo Open 2026',notes:'New PB!'},{id:103,athleteId:1,date:'2026-02-15',type:'practice',stroke:'Freestyle',distance:100,poolLength:50,time:59.1,isPB:false,meetName:'',notes:''},{id:104,athleteId:1,date:'2026-01-20',type:'meet',stroke:'Freestyle',distance:100,poolLength:50,time:60.2,isPB:false,meetName:'January Open',notes:''},{id:105,athleteId:1,date:'2026-03-20',type:'practice',stroke:'Freestyle',distance:200,poolLength:50,time:128.5,isPB:true,meetName:'',notes:'First 200m timed'},{id:106,athleteId:2,date:'2026-03-18',type:'meet',stroke:'Butterfly',distance:100,poolLength:50,time:68.32,isPB:true,meetName:'SL Junior Championships',notes:'First sub-70!'},{id:107,athleteId:2,date:'2026-03-05',type:'practice',stroke:'Butterfly',distance:100,poolLength:50,time:70.1,isPB:false,meetName:'',notes:''},{id:108,athleteId:2,date:'2026-02-10',type:'meet',stroke:'Butterfly',distance:100,poolLength:50,time:71.4,isPB:false,meetName:'February Open',notes:''},{id:109,athleteId:2,date:'2026-03-05',type:'practice',stroke:'Butterfly',distance:50,poolLength:25,time:31.4,isPB:true,meetName:'',notes:''},{id:110,athleteId:3,date:'2026-03-22',type:'time_trial',stroke:'Breaststroke',distance:100,poolLength:50,time:62.1,isPB:false,meetName:'',notes:'Olympic prep'},{id:111,athleteId:3,date:'2026-02-28',type:'meet',stroke:'Breaststroke',distance:100,poolLength:50,time:61.45,isPB:true,meetName:'National Open 2026',notes:'National qualifier!'},{id:112,athleteId:3,date:'2026-01-15',type:'meet',stroke:'Breaststroke',distance:100,poolLength:50,time:62.8,isPB:false,meetName:'January Open',notes:''},{id:113,athleteId:3,date:'2025-12-10',type:'meet',stroke:'Breaststroke',distance:100,poolLength:50,time:63.5,isPB:false,meetName:'End of Year Meet',notes:''}]};sTDB();}
+function seedUsers(){UDB={users:[{id:'u1',username:'admin',password:'admin123',role:'admin',name:'Head Coach Pradeep',email:'pradeep@swimiq.lk',phone:'+94 77 123 4567',athleteId:null,linkedAthleteIds:[],active:true},{id:'u2',username:'coach.nimal',password:'coach123',role:'coach',name:'Nimal Perera',email:'nimal@swimiq.lk',phone:'+94 71 234 5678',athleteId:null,linkedAthleteIds:[1,2,3],active:true},{id:'u3',username:'kasun',password:'kasun123',role:'athlete',name:'Kasun Silva',email:'kasun@email.com',phone:'',athleteId:1,linkedAthleteIds:[],active:true},{id:'u4',username:'amara',password:'amara123',role:'athlete',name:'Amara Jayawardena',email:'amara@email.com',phone:'',athleteId:2,linkedAthleteIds:[],active:true},{id:'u5',username:'dilshan',password:'dilshan123',role:'athlete',name:'Dilshan Fernando',email:'dilshan@email.com',phone:'',athleteId:3,linkedAthleteIds:[],active:true},{id:'u6',username:'parent.silva',password:'parent123',role:'parent',name:'Sunil Silva',email:'sunil@email.com',phone:'+94 77 678 9012',athleteId:null,linkedAthleteIds:[1],active:true}]};sUDB();}
+function seedAtt(){ADB={sessions:[{id:'s1',date:'2026-03-28',slot:'Morning',time:'06:00–08:00',coach:'Nimal Perera',focus:'Stroke Technique',records:[{athleteId:1,status:'present',note:''},{athleteId:2,status:'present',note:''},{athleteId:3,status:'absent',note:'Competition travel'}]},{id:'s2',date:'2026-03-27',slot:'Morning',time:'06:00–08:00',coach:'Nimal Perera',focus:'Sprint Sets',records:[{athleteId:1,status:'present',note:''},{athleteId:2,status:'late',note:'Arrived 20 min late'},{athleteId:3,status:'present',note:''}]},{id:'s3',date:'2026-03-26',slot:'Morning',time:'06:00–08:00',coach:'Nimal Perera',focus:'Endurance',records:[{athleteId:1,status:'present',note:''},{athleteId:2,status:'present',note:''},{athleteId:3,status:'present',note:''}]},{id:'s4',date:'2026-03-25',slot:'Evening',time:'16:00–18:00',coach:'Nimal Perera',focus:'Turns & Starts',records:[{athleteId:1,status:'excused',note:'Medical'},{athleteId:2,status:'present',note:''},{athleteId:3,status:'present',note:''}]},{id:'s5',date:'2026-03-24',slot:'Morning',time:'06:00–08:00',coach:'Nimal Perera',focus:'Race Simulation',records:[{athleteId:1,status:'present',note:''},{athleteId:2,status:'present',note:''},{athleteId:3,status:'present',note:''}]},{id:'s6',date:'2026-03-22',slot:'Morning',time:'06:00–08:00',coach:'Nimal Perera',focus:'Drills',records:[{athleteId:1,status:'present',note:''},{athleteId:2,status:'absent',note:''},{athleteId:3,status:'present',note:''}]},{id:'s7',date:'2026-03-21',slot:'Morning',time:'06:00–08:00',coach:'Nimal Perera',focus:'Kick Sets',records:[{athleteId:1,status:'present',note:''},{athleteId:2,status:'present',note:''},{athleteId:3,status:'present',note:''}]},{id:'s8',date:'2026-03-19',slot:'Morning',time:'06:00–08:00',coach:'Nimal Perera',focus:'Video Analysis',records:[{athleteId:1,status:'present',note:''},{athleteId:2,status:'present',note:''},{athleteId:3,status:'present',note:''}]},{id:'s9',date:'2026-03-17',slot:'Evening',time:'16:00–18:00',coach:'Nimal Perera',focus:'Speed Work',records:[{athleteId:1,status:'present',note:''},{athleteId:2,status:'late',note:'School exam'},{athleteId:3,status:'present',note:''}]},{id:'s10',date:'2026-03-15',slot:'Morning',time:'06:00–08:00',coach:'Nimal Perera',focus:'Stroke Polish',records:[{athleteId:1,status:'present',note:''},{athleteId:2,status:'present',note:''},{athleteId:3,status:'present',note:''}]}]};sADB();}
+function seedFin(){FDB={packages:[{id:'pkg1',name:'Beginner Monthly',description:'3 sessions/week, stroke coaching',sessionsPerWeek:3,durationMonths:1,price:8500,color:'teal',active:true},{id:'pkg2',name:'Intermediate Monthly',description:'5 sessions/week, technique + video',sessionsPerWeek:5,durationMonths:1,price:14000,color:'blue',active:true},{id:'pkg3',name:'Elite Monthly',description:'Daily training, race prep, AI analysis',sessionsPerWeek:6,durationMonths:1,price:22000,color:'coral',active:true},{id:'pkg4',name:'Term Package (3 mo)',description:'5 sessions/week × 3 months, save 10%',sessionsPerWeek:5,durationMonths:3,price:37800,color:'purple',active:true}],enrollments:[{id:'enr1',athleteId:1,packageId:'pkg2',startDate:'2026-01-01',endDate:'2026-06-30',autoRenew:true,active:true},{id:'enr2',athleteId:2,packageId:'pkg1',startDate:'2026-02-01',endDate:'2026-04-30',autoRenew:false,active:true},{id:'enr3',athleteId:3,packageId:'pkg3',startDate:'2026-01-01',endDate:'2026-12-31',autoRenew:true,active:true}],payments:[{id:'pay1',athleteId:1,packageId:'pkg2',amount:14000,date:'2026-03-01',dueDate:'2026-03-05',status:'paid',method:'Bank Transfer',receiptNo:'RCP-2026-031',month:'March 2026',notes:''},{id:'pay2',athleteId:1,packageId:'pkg2',amount:14000,date:'2026-02-03',dueDate:'2026-02-05',status:'paid',method:'Cash',receiptNo:'RCP-2026-021',month:'February 2026',notes:''},{id:'pay3',athleteId:1,packageId:'pkg2',amount:14000,date:'2026-01-04',dueDate:'2026-01-05',status:'paid',method:'Bank Transfer',receiptNo:'RCP-2026-011',month:'January 2026',notes:''},{id:'pay4',athleteId:1,packageId:'pkg2',amount:14000,date:null,dueDate:'2026-04-05',status:'pending',method:null,receiptNo:null,month:'April 2026',notes:''},{id:'pay5',athleteId:2,packageId:'pkg1',amount:8500,date:'2026-03-02',dueDate:'2026-03-05',status:'paid',method:'Online',receiptNo:'RCP-2026-032',month:'March 2026',notes:''},{id:'pay6',athleteId:2,packageId:'pkg1',amount:8500,date:'2026-02-04',dueDate:'2026-02-05',status:'paid',method:'Cash',receiptNo:'RCP-2026-022',month:'February 2026',notes:''},{id:'pay7',athleteId:2,packageId:'pkg1',amount:8500,date:null,dueDate:'2026-04-05',status:'pending',method:null,receiptNo:null,month:'April 2026',notes:''},{id:'pay8',athleteId:3,packageId:'pkg3',amount:22000,date:'2026-03-01',dueDate:'2026-03-05',status:'paid',method:'Bank Transfer',receiptNo:'RCP-2026-033',month:'March 2026',notes:''},{id:'pay9',athleteId:3,packageId:'pkg3',amount:22000,date:'2026-01-02',dueDate:'2026-01-05',status:'paid',method:'Bank Transfer',receiptNo:'RCP-2026-013',month:'January 2026',notes:''},{id:'pay10',athleteId:3,packageId:'pkg3',amount:22000,date:null,dueDate:'2026-02-05',status:'overdue',method:null,receiptNo:null,month:'February 2026',notes:'Reminder sent'}]};sFDB();}
+
+// ============================================================
+// LOGIN / LOGOUT
+// ============================================================
+function fl(u,p){document.getElementById('lu').value=u;document.getElementById('lp').value=p;}
+function doLogin(){
+  const u=document.getElementById('lu').value.trim(),p=document.getElementById('lp').value;
+  const user=UDB.users.find(x=>x.username===u&&x.password===p&&x.active);
+  if(!user){document.getElementById('lerr').textContent='Invalid username or password.';return;}
+  CU=user;
+  document.getElementById('ls').style.display='none';
+  document.getElementById('app').classList.add('on');
+  applyRoleUI();
+  // Auto-select athlete
+  if(CU.role==='athlete'&&CU.athleteId) SA=CU.athleteId;
+  else if(CU.role==='parent'&&CU.linkedAthleteIds.length) SA=CU.linkedAthleteIds[0];
+  else if(DB.athletes.length) SA=DB.athletes[0].id;
+  renderTree();
+  goSec('dashboard');
+  updateOvBadge();
+  // Update school name display after DB is loaded
+  const schoolName=DB.athletes.length?DB.athletes[0].club:'SwimIQ School';
+  const h=document.getElementById('hdr-school-name'),s=document.getElementById('sb-school-name');
+  if(h)h.textContent=schoolName;if(s)s.textContent=schoolName;
+}
+function doLogout(){
+  CU=null;SA=null;
+  document.getElementById('ls').style.display='flex';
+  document.getElementById('app').classList.remove('on');
+  document.getElementById('lu').value='';document.getElementById('lp').value='';
+  document.getElementById('lerr').textContent='';
+}
+function applyRoleUI(){
+  const r=CU.role;
+  const RB={admin:'rb-admin',coach:'rb-coach',athlete:'rb-athlete',parent:'rb-parent'};
+  const RI={admin:'👑',coach:'🏊',athlete:'🏅',parent:'👪'};
+  const AVBG={admin:'#1E3A5F',coach:'#0F3330',athlete:'#2D1A4D',parent:'#3D2E00'};
+  const AVTX={admin:'#60A5FA',coach:'#34D399',athlete:'#C084FC',parent:'#FCD34D'};
+  const inits=CU.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  const el=document.getElementById('huav');
+  el.textContent=inits;el.style.cssText=`background:${AVBG[r]||'#1E3A5F'};color:${AVTX[r]||'#60A5FA'};width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:9px;font-weight:700`;
+  document.getElementById('hname').textContent=CU.name;
+  const rb=document.getElementById('hrole');rb.textContent=RI[r]+' '+r;rb.className='rbadge '+RB[r];
+
+  // Show/hide role-gated nav elements
+  const isAC=r==='admin'||r==='coach';
+  document.querySelectorAll('.adm-only').forEach(el=>el.style.display=r==='admin'?'':'none');
+  document.querySelectorAll('.cch-only').forEach(el=>el.style.display=isAC?'':'none');
+
+  // Log time card — visible to admin, coach, and athlete
+  const ltc=document.getElementById('log-time-card');
+  if(ltc)ltc.style.display=(isAC||r==='athlete')?'block':'none';
+
+  // Add athlete button — only admin and coach
+  const addBtn=document.getElementById('sb-add-athlete-btn');
+  if(addBtn)addBtn.style.display=isAC?'block':'none';
+
+  // Analysis nav — show for admin and coach; athletes see history only
+  const anNav=document.getElementById('nv-analysis');
+  if(anNav)anNav.style.display=isAC?'flex':'none';
+
+  // For athletes: show analysis page but hide AI mode toggle, show only manual if not coach
+  // Actually athletes CAN see analysis — they just can't see AI key
+  // Show/hide export
+  document.getElementById('dlbl').textContent=`${CU.name} · ${r}`;
+
+  // School name in header and sidebar — use club of first athlete, or admin school name
+  const schoolName=DB.athletes.length?DB.athletes[0].club:'SwimIQ School';
+  const hSchool=document.getElementById('hdr-school-name');
+  const sbSchool=document.getElementById('sb-school-name');
+  if(hSchool)hSchool.textContent=schoolName;
+  if(sbSchool)sbSchool.textContent=schoolName;
+
+  // Delete column visibility
+  const dc=document.getElementById('tr-del-col');if(dc)dc.style.display=isAC||r==='athlete'?'':'none';
+
+  // If parent — hide analysis and finance topbar buttons
+  if(r==='parent'){
+    const anNav2=document.getElementById('nv-analysis');if(anNav2)anNav2.style.display='none';
+  }
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function calcAgeFromDob(dob){if(!dob)return null;const d=new Date(dob),now=new Date();let age=now.getFullYear()-d.getFullYear();const m=now.getMonth()-d.getMonth();if(m<0||(m===0&&now.getDate()<d.getDate()))age--;return age;}
+function fmtT(s){if(s===null||s===undefined)return'—';const m=Math.floor(s/60),sec=(s%60).toFixed(2).padStart(5,'0');return m>0?`${m}:${sec}`:sec;}
+function parseT(str){str=(str||'').trim();if(!str)return null;if(str.includes(':')){const p=str.split(':');const m=parseInt(p[0]),s=parseFloat(p[1]);if(isNaN(m)||isNaN(s))return null;return m*60+s;}const v=parseFloat(str);return isNaN(v)?null:v;}
+function fmtLKR(n){return'Rs. '+Number(n||0).toLocaleString();}
+function getA(){return DB.athletes.find(x=>x.id===SA)||null;}
+function dChart(id){if(CHS[id]){CHS[id].destroy();delete CHS[id];}}
+function scC(s){return s>=80?'sfg':s>=55?'sfm':'sfr';}
+function scTx(s){return s>=80?'var(--a2)':s>=55?'var(--a4)':'var(--danger)';}
+function chipC(color){return{blue:'ch-b',teal:'ch-t',coral:'ch-c',purple:'ch-p'}[color]||'ch-b';}
+
+// ============================================================
+// TREE
+// ============================================================
+function renderTree(){
+  const q=(document.getElementById('sbq').value||'').toLowerCase();
+  let athl=DB.athletes;
+  if(CU.role==='athlete')athl=athl.filter(x=>x.id===CU.athleteId);
+  else if(CU.role==='parent')athl=athl.filter(x=>CU.linkedAthleteIds.includes(x.id));
+  if(q)athl=athl.filter(a=>a.name.toLowerCase().includes(q)||a.stroke.toLowerCase().includes(q));
+  document.getElementById('atree').innerHTML=athl.map(a=>{
+    const av=a.photo?`<img src="${a.photo}" alt="${a.name}">`:`<span>${a.initials}</span>`;
+    return`<div class="ti${SA===a.id?' sel':''}" onclick="selA(${a.id})">
+      <div class="tiav" style="background:${ABG[a.color]||'#1E3A5F'};color:${ATX[a.color]||'#60A5FA'}">${av}</div>
+      <div style="flex:1;min-width:0"><div class="tname">${a.name}</div><div style="font-size:9px;color:var(--t3)">${a.stroke} · Age ${calcAgeFromDob(a.dob)||'?'}</div></div>
+      <div class="tdot" style="background:${LDOT[a.level]||'#3D5F80'}"></div>
+    </div>`;}).join('');
+}
+function selA(id){SA=id;renderTree();refresh();}
+
+// ============================================================
+// SECTIONS
+// ============================================================
+function goSec(s){
+  CS=s;
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('act'));
+  document.querySelectorAll('.nv').forEach(n=>n.classList.remove('act'));
+  const pg=document.getElementById('pg-'+s);if(pg)pg.classList.add('act');
+  const nv=document.getElementById('nv-'+s);if(nv)nv.classList.add('act');
+  const T={dashboard:'Dashboard',times:'Times & Records',attendance:'Attendance',finance:'Payments & Packages',analysis:'AI Analysis',history:'Analysis Reports',users:'User Management',packages:'Packages & Pricing'};
+  document.getElementById('hdr-pg').textContent=T[s]||s;
+  refresh();
+}
+function refresh(){
+  const a=getA();
+  if(CS==='dashboard')renderDash(a);
+  else if(CS==='times')renderTimes(a);
+  else if(CS==='attendance')renderAtt(a);
+  else if(CS==='finance')renderFin(a);
+  else if(CS==='analysis')renderAnSec(a);
+  else if(CS==='history')renderHist(a);
+  else if(CS==='users')renderUsers();
+  else if(CS==='packages')renderPkgs();
+}
+function updateOvBadge(){
+  const n=FDB.payments.filter(x=>x.status==='overdue').length;
+  const b=document.getElementById('ovbadge');
+  if(!b)return;
+  if(n>0){b.textContent=n;b.classList.remove('hidden');}else b.classList.add('hidden');
+}
+
+// ============================================================
+// BANNER
+// ============================================================
+function mkBanner(a){
+  if(!a)return'';
+  const recs=DB.analyses.filter(x=>x.athleteId===a.id);
+  const tr=TDB.records.filter(x=>x.athleteId===a.id);
+  const avg=recs.length?Math.round(recs.reduce((s,x)=>s+x.score,0)/recs.length):null;
+  const best=recs.length?Math.max(...recs.map(x=>x.score)):null;
+  const pbs=getPBs(a.id).length;
+  const av=a.photo?`<img src="${a.photo}" alt="${a.name}">`:`<span style="font-family:'Bebas Neue',sans-serif;font-size:20px">${a.initials}</span>`;
+  const cc=chipC(a.color);
+  const isAC=CU.role==='admin'||CU.role==='coach';
+  const editBtn=isAC?`<div class="bst" style="cursor:pointer" onclick="openEditA(${a.id})"><div class="bsv" style="font-size:18px">✏️</div><div class="bsl">Edit</div></div>`:'';
+  return`<div class="bav" style="background:${ABG[a.color]};color:${ATX[a.color]}">${av}</div>
+  <div class="binfo">
+    <div class="bname">${a.name}</div>
+    <div class="bsub">${a.club||'No club'} · ${a.gender||''} · Age ${calcAgeFromDob(a.dob)||'?'}</div>
+    <div class="bchips"><span class="chip ${cc}">${a.stroke}</span><span class="chip ${cc}">${a.level}</span></div>
+  </div>
+  <div class="bstats">
+    <div class="bst"><div class="bsv">${avg||'—'}</div><div class="bsl">Avg Score</div></div>
+    <div class="bst"><div class="bsv" style="color:var(--a2)">${best||'—'}</div><div class="bsl">Best</div></div>
+    <div class="bst"><div class="bsv" style="color:var(--pb)">${pbs}</div><div class="bsl">PBs</div></div>
+    <div class="bst"><div class="bsv" style="color:var(--t2)">${tr.length}</div><div class="bsl">Records</div></div>
+    ${editBtn}
+  </div>`;
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function renderDash(a){
+  const ns=document.getElementById('ns-dash'),dc=document.getElementById('dc');
+  if(!a){ns.classList.remove('hidden');dc.classList.add('hidden');return;}
+  ns.classList.add('hidden');dc.classList.remove('hidden');
+  document.getElementById('db').innerHTML=mkBanner(a);
+
+  const recs=DB.analyses.filter(x=>x.athleteId===a.id);
+  const tr=TDB.records.filter(x=>x.athleteId===a.id);
+  const ss=ADB.sessions;
+  const aRecs=ss.flatMap(s=>(s.records||[]).filter(r=>r.athleteId===a.id).map(r=>({...r,date:s.date})));
+  const aTotal=aRecs.length,aPres=aRecs.filter(r=>r.status==='present'||r.status==='late').length;
+  const aRate=aTotal?Math.round(aPres/aTotal*100):0;
+  const avg=recs.length?Math.round(recs.reduce((s,x)=>s+x.score,0)/recs.length):null;
+  const best=recs.length?Math.max(...recs.map(x=>x.score)):null;
+  const trend=recs.length>=2?recs[0].score-recs[1].score:null;
+  const tH=trend===null?'':`<span class="${trend>0?'trup':trend<0?'trdn':'trfl'}">${trend>0?'▲':'▼'} ${Math.abs(trend)}pts</span>`;
+  const enr=FDB.enrollments.find(x=>x.athleteId===a.id&&x.active);
+  const pkg=enr?FDB.packages.find(x=>x.id===enr.packageId):null;
+  const lp=FDB.payments.filter(x=>x.athleteId===a.id).sort((a,b)=>new Date(b.dueDate)-new Date(a.dueDate))[0];
+
+  document.getElementById('dstats').innerHTML=`
+    <div class="dsc"><div class="dsbig" style="color:var(--a)">${recs.length?recs[0].score:'—'}</div><div class="dslbl">Latest Score</div><div class="dstrend">${tH}</div></div>
+    <div class="dsc"><div class="dsbig" style="color:var(--a2)">${avg||'—'}</div><div class="dslbl">Avg Score</div></div>
+    <div class="dsc"><div class="dsbig" style="color:var(--t1)">${recs.length}</div><div class="dslbl">Analyses</div></div>
+    <div class="dsc"><div class="dsbig" style="color:var(--pb)">${getPBs(a.id).length}</div><div class="dslbl">Pers. Bests</div></div>
+    <div class="dsc"><div class="dsbig" style="color:var(--a4)">${aRate}%</div><div class="dslbl">Attendance</div></div>
+    <div class="dsc"><div class="dsbig" style="color:var(--a3)">${tr.filter(x=>x.type==='meet').length}</div><div class="dslbl">Meet Swims</div></div>
+  `;
+
+  // Score trend
+  dChart('cst');
+  const st=recs.slice(0,8).reverse();
+  if(st.length){
+    CHS['cst']=new Chart(document.getElementById('cst').getContext('2d'),{type:'line',data:{labels:st.map(x=>x.date.slice(5)),datasets:[{label:'Score',data:st.map(x=>x.score),borderColor:'#0EA5E9',backgroundColor:'rgba(14,165,233,.1)',tension:.4,fill:true,pointBackgroundColor:'#0EA5E9',pointRadius:4,pointHoverRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:40,max:100,grid:{color:'#1A2840'},ticks:{color:'#3A5F7A',font:{size:9}}},x:{grid:{color:'#1A2840'},ticks:{color:'#3A5F7A',font:{size:9}}}}}});
+  }
+
+  // 100m time trend
+  dChart('ctt');
+  const t100=tr.filter(x=>x.distance===100&&x.poolLength===50).sort((a,b)=>new Date(a.date)-new Date(b.date));
+  if(t100.length){
+    CHS['ctt']=new Chart(document.getElementById('ctt').getContext('2d'),{type:'line',data:{labels:t100.map(x=>x.date.slice(5)),datasets:[{label:'100m',data:t100.map(x=>x.time),borderColor:'#10B981',backgroundColor:'rgba(16,185,129,.1)',tension:.4,fill:true,pointBackgroundColor:'#10B981',pointRadius:4,pointHoverRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:'#1A2840'},ticks:{color:'#3A5F7A',font:{size:9},callback:v=>fmtT(v)}},x:{grid:{color:'#1A2840'},ticks:{color:'#3A5F7A',font:{size:9}}}}}});
+  }
+
+  // PBs
+  const pbs=getPBs(a.id);
+  document.getElementById('dpbs').innerHTML=pbs.length?pbs.slice(0,8).map(p=>`<div class="pbc"><div class="pbev">${p.distance}m ${p.stroke}</div><div class="pbtime">${fmtT(p.time)}</div><div class="pbdt">${p.date}</div><div class="pbmt">${p.meetName||'Practice'}</div></div>`).join(''):'<div style="font-size:11px;color:var(--t3)">No PBs logged yet.</div>';
+
+  // Attendance donut
+  dChart('cad');
+  const cnt={present:aRecs.filter(r=>r.status==='present').length,late:aRecs.filter(r=>r.status==='late').length,excused:aRecs.filter(r=>r.status==='excused').length,absent:aRecs.filter(r=>r.status==='absent').length};
+  CHS['cad']=new Chart(document.getElementById('cad').getContext('2d'),{type:'doughnut',data:{labels:['Present','Late','Excused','Absent'],datasets:[{data:[cnt.present,cnt.late,cnt.excused,cnt.absent],backgroundColor:['#10B981','#F59E0B','#3B82F6','#EF4444'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},cutout:'62%'}});
+  document.getElementById('datt').innerHTML=`<span style="font-size:9px;color:#10B981">● ${cnt.present} Present</span><span style="font-size:9px;color:#F59E0B">● ${cnt.late} Late</span><span style="font-size:9px;color:#3B82F6">● ${cnt.excused} Excused</span><span style="font-size:9px;color:#EF4444">● ${cnt.absent} Absent</span>`;
+
+  // Latest analysis
+  const lr=recs[0];
+  const le=document.getElementById('dlat');
+  if(!lr){le.innerHTML='<div class="empty"><span class="eico">📊</span><div class="ettl">No analyses yet</div><div class="esub">Run an AI analysis to get started.</div></div>';}
+  else{le.innerHTML=`<div style="text-align:center;margin-bottom:.65rem"><div style="font-family:'Bebas Neue',sans-serif;font-size:48px;color:${scTx(lr.score)};line-height:1">${lr.score}</div><div style="font-size:9px;color:var(--t3)">${lr.date} · ${lr.typeLabel}</div></div>${(lr.techniqueScores||[]).slice(0,5).map(s=>`<div class="srow"><div class="slb">${s.name}</div><div class="str"><div class="sf ${scC(s.score)}" style="width:${s.score}%"></div></div><div class="sval" style="color:${scTx(s.score)}">${s.score}</div></div>`).join('')}`;}
+
+  // Finance card
+  const isAC=CU.role==='admin'||CU.role==='coach';
+  const fc=document.getElementById('dfin');
+  if(fc){fc.style.display=isAC?'block':'none';}
+  if(isAC){
+    document.getElementById('dfp').innerHTML=`<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      ${pkg?`<div style="font-size:12px;font-weight:700">${pkg.name}</div><div style="font-size:10px;color:var(--t2)">${fmtLKR(pkg.price)}/month</div>`:'<div style="font-size:11px;color:var(--t3)">No package enrolled</div>'}
+      ${lp?`<span class="sp sp-${lp.status}">${lp.status.toUpperCase()}</span><div style="font-size:10px;color:var(--t2)">${lp.month}</div>`:''}
+      <button class="btn btn-sm" style="margin-left:auto" onclick="goSec('finance')">View →</button>
+    </div>`;
+  }
+}
+
+// ============================================================
+// TIMES
+// ============================================================
+function getPBs(aid){
+  const map={};
+  TDB.records.filter(x=>x.athleteId===aid&&x.isPB).forEach(r=>{
+    const k=`${r.stroke}|${r.distance}|${r.poolLength}`;
+    if(!map[k]||r.time<map[k].time)map[k]=r;
+  });
+  return Object.values(map).sort((a,b)=>a.stroke.localeCompare(b.stroke));
+}
+function isBetter(rec){
+  const prev=TDB.records.filter(r=>r.athleteId===rec.athleteId&&r.stroke===rec.stroke&&r.distance===rec.distance&&r.poolLength===rec.poolLength);
+  return!prev.length||rec.time<Math.min(...prev.map(r=>r.time));
+}
+
+function renderTimes(a){
+  const ns=document.getElementById('ns-times'),tc=document.getElementById('tc');
+  if(!a){ns.classList.remove('hidden');tc.classList.add('hidden');return;}
+  ns.classList.add('hidden');tc.classList.remove('hidden');
+  document.getElementById('tb').innerHTML=mkBanner(a);
+  const dateEl=document.getElementById('tr-date');if(!dateEl.value)dateEl.value=new Date().toISOString().slice(0,10);
+  document.getElementById('tr-stroke').value=a.stroke;
+
+  // Multi-line chart: one line per stroke (100m times over time)
+  dChart('ctl');
+  const recs100=TDB.records.filter(x=>x.athleteId===a.id&&x.distance===100&&x.poolLength===50).sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const strokes=[...new Set(recs100.map(x=>x.stroke))];
+  const SC={Freestyle:'#0EA5E9',Butterfly:'#8B5CF6',Backstroke:'#10B981',Breaststroke:'#F59E0B',IM:'#EF4444'};
+  if(strokes.length){
+    const datasets=strokes.map(sk=>{
+      const sr=recs100.filter(r=>r.stroke===sk);
+      return{label:sk,data:sr.map(r=>({x:r.date,y:r.time})),borderColor:SC[sk]||'#60A5FA',backgroundColor:'transparent',tension:.4,pointBackgroundColor:SC[sk]||'#60A5FA',pointRadius:5,pointHoverRadius:7,borderWidth:2};
+    });
+    CHS['ctl']=new Chart(document.getElementById('ctl').getContext('2d'),{type:'line',data:{datasets},options:{responsive:true,maintainAspectRatio:false,parsing:{xAxisKey:'x',yAxisKey:'y'},plugins:{legend:{labels:{color:'#7BAAC8',font:{size:10},boxWidth:12}}},scales:{y:{grid:{color:'#1A2840'},ticks:{color:'#3A5F7A',font:{size:9},callback:v=>fmtT(v)}},x:{type:'category',grid:{color:'#1A2840'},ticks:{color:'#3A5F7A',font:{size:9}}}}}});
+  }else{document.getElementById('ctl').parentElement.innerHTML='<div style="text-align:center;padding:2rem;font-size:11px;color:var(--t3)">No 100m records yet for this athlete.</div>';}
+
+  // PBs
+  const pbs=getPBs(a.id);
+  document.getElementById('pbgrid').innerHTML=pbs.length?pbs.map(p=>`<div class="pbc"><div class="pbev">${p.distance}m ${p.stroke} · ${p.poolLength}m</div><div class="pbtime">${fmtT(p.time)}</div><div class="pbdt">${p.date}</div><div class="pbmt">${p.meetName||'Practice'}</div></div>`).join(''):'<div style="font-size:11px;color:var(--t3)">No PBs yet. Log your first time!</div>';
+
+  renderTimesTable();
+}
+
+function logTime(){
+  const a=getA();if(!a)return;
+  // For athletes, they can only log their own time
+  if(CU.role==='athlete'&&CU.athleteId!==a.id){alert('You can only log your own times.');return;}
+  const ts=parseT(document.getElementById('tr-time').value);
+  const dv=document.getElementById('tr-date').value;
+  if(!dv){alert('Please enter a date.');return;}
+  if(!ts||ts<=0){alert('Please enter a valid time (e.g. 58.30 or 1:02.45).');return;}
+  const rec={id:Date.now(),athleteId:a.id,date:dv,type:document.getElementById('tr-type').value,stroke:document.getElementById('tr-stroke').value,distance:parseInt(document.getElementById('tr-dist').value),poolLength:parseInt(document.getElementById('tr-pool').value),time:ts,isPB:false,meetName:document.getElementById('tr-meet').value.trim(),notes:document.getElementById('tr-notes').value.trim()};
+  rec.isPB=isBetter(rec);
+  TDB.records.unshift(rec);sTDB();
+  document.getElementById('tr-time').value='';document.getElementById('tr-meet').value='';document.getElementById('tr-notes').value='';
+  renderTimes(a);
+  if(rec.isPB)setTimeout(()=>alert('🥇 New Personal Best!\n'+fmtT(ts)+' — '+rec.stroke+' '+rec.distance+'m'),100);
+}
+
+function renderTimesTable(){
+  const a=getA();if(!a)return;
+  const sf=document.getElementById('tf-s').value,tf=document.getElementById('tf-t').value;
+  let recs=TDB.records.filter(r=>r.athleteId===a.id);
+  if(sf)recs=recs.filter(r=>r.stroke===sf);
+  if(tf)recs=recs.filter(r=>r.type===tf);
+  const canDel=CU.role==='admin'||CU.role==='coach'||(CU.role==='athlete'&&CU.athleteId===a.id);
+  document.getElementById('ttb').innerHTML=recs.length?recs.map(r=>`<tr>
+    <td>${r.date}</td>
+    <td><span class="sp sp-${r.type}">${r.type==='time_trial'?'Trial':r.type.charAt(0).toUpperCase()+r.type.slice(1)}</span></td>
+    <td>${r.distance}m ${r.stroke}</td>
+    <td>${r.poolLength}m</td>
+    <td><span class="tval">${fmtT(r.time)}</span>${r.isPB?` <span class="chip ch-y">⭐ PB</span>`:''}</td>
+    <td style="color:var(--t2)">${r.meetName||'—'}</td>
+    <td style="color:var(--t3);font-size:10px">${r.notes||'—'}</td>
+    ${canDel?`<td><button class="delbtn" onclick="delTime(${r.id})">🗑</button></td>`:'<td></td>'}
+  </tr>`).join(''):`<tr><td colspan="8" style="text-align:center;color:var(--t3);padding:1.5rem;font-size:11px">No records found.</td></tr>`;
+}
+function delTime(id){if(!confirm('Delete this time record?'))return;TDB.records=TDB.records.filter(x=>x.id!==id);sTDB();renderTimes(getA());}
+
+// ============================================================
+// ATTENDANCE
+// ============================================================
+function renderAtt(a){
+  const ns=document.getElementById('ns-att'),ac=document.getElementById('ac');
+  if(!a){ns.classList.remove('hidden');ac.classList.add('hidden');return;}
+  ns.classList.add('hidden');ac.classList.remove('hidden');
+  document.getElementById('ab').innerHTML=mkBanner(a);
+
+  const ss=ADB.sessions;
+  const aRecs=ss.map(s=>{const r=s.records.find(x=>x.athleteId===a.id);return r?{...r,date:s.date,slot:s.slot,time:s.time,focus:s.focus,sid:s.id}:null;}).filter(Boolean).sort((a,b)=>new Date(b.date)-new Date(a.date));
+
+  // Donut
+  dChart('car');
+  const cnt={present:aRecs.filter(r=>r.status==='present').length,late:aRecs.filter(r=>r.status==='late').length,excused:aRecs.filter(r=>r.status==='excused').length,absent:aRecs.filter(r=>r.status==='absent').length};
+  CHS['car']=new Chart(document.getElementById('car').getContext('2d'),{type:'doughnut',data:{labels:['Present','Late','Excused','Absent'],datasets:[{data:[cnt.present,cnt.late,cnt.excused,cnt.absent],backgroundColor:['#10B981','#F59E0B','#3B82F6','#EF4444'],borderWidth:0,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#7BAAC8',font:{size:10},boxWidth:12}}},cutout:'55%'}});
+
+  // Monthly bar
+  dChart('cam');
+  const mo={};
+  aRecs.forEach(r=>{const m=r.date.slice(0,7);if(!mo[m])mo[m]={p:0,a:0};if(r.status==='present'||r.status==='late')mo[m].p++;else mo[m].a++;});
+  const mkeys=Object.keys(mo).sort();
+  CHS['cam']=new Chart(document.getElementById('cam').getContext('2d'),{type:'bar',data:{labels:mkeys.map(m=>{const d=new Date(m+'-01');return d.toLocaleString('default',{month:'short'});}),datasets:[{label:'Present',data:mkeys.map(m=>mo[m].p),backgroundColor:'rgba(16,185,129,.65)',borderRadius:3},{label:'Absent/Late',data:mkeys.map(m=>mo[m].a),backgroundColor:'rgba(239,68,68,.55)',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#7BAAC8',font:{size:10},boxWidth:12}}},scales:{x:{stacked:true,grid:{color:'#1A2840'},ticks:{color:'#3A5F7A',font:{size:9}}},y:{stacked:true,grid:{color:'#1A2840'},ticks:{color:'#3A5F7A',font:{size:9}}}}}});
+
+  // Table
+  const isAC=CU.role==='admin'||CU.role==='coach';
+  document.getElementById('atb').innerHTML=aRecs.map(r=>`<tr>
+    <td>${r.date}</td><td>${r.slot}</td><td style="color:var(--t2);font-size:10px">${r.time||''}</td>
+    <td style="color:var(--t2)">${r.focus||'—'}</td>
+    <td><span class="sp sp-${r.status}">${r.status}</span></td>
+    <td style="color:var(--t3);font-size:10px">${r.note||'—'}</td>
+    ${isAC?`<td><select onchange="updAtt('${r.sid}',${a.id},this.value)" style="font-size:10px;padding:3px 6px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);color:var(--t1);font-family:'Sora',sans-serif">
+      <option${r.status==='present'?' selected':''} value="present">Present</option>
+      <option${r.status==='late'?' selected':''} value="late">Late</option>
+      <option${r.status==='excused'?' selected':''} value="excused">Excused</option>
+      <option${r.status==='absent'?' selected':''} value="absent">Absent</option>
+    </select></td>`:'<td></td>'}
+  </tr>`).join('');
+}
+function updAtt(sid,aid,val){const s=ADB.sessions.find(x=>x.id===sid);if(!s)return;const r=s.records.find(x=>x.athleteId===aid);if(r)r.status=val;sADB();}
+function openMarkAtt(){
+  document.getElementById('att-date').value=new Date().toISOString().slice(0,10);
+  document.getElementById('att-time').value='06:00–08:00';
+  document.getElementById('att-coach').value=CU.name;
+  document.getElementById('att-focus').value='';
+  document.getElementById('att-rows').innerHTML=DB.athletes.map(a=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:.45rem 0;border-bottom:1px solid var(--b1)">
+      <div style="flex:1;font-size:11px;font-weight:500">${a.name} <span style="font-size:9px;color:var(--t3)">${a.stroke}</span></div>
+      <select id="as-${a.id}" style="font-size:10px;padding:3px 7px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);color:var(--t1);font-family:'Sora',sans-serif">
+        <option value="present">Present</option><option value="late">Late</option><option value="excused">Excused</option><option value="absent">Absent</option>
+      </select>
+      <input type="text" id="an-${a.id}" placeholder="note" style="font-size:10px;padding:3px 8px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);color:var(--t1);font-family:'Sora',sans-serif;width:110px">
+    </div>`).join('');
+  document.getElementById('mo-att').classList.add('open');
+}
+function saveAtt(){
+  const sess={id:'s'+Date.now(),date:document.getElementById('att-date').value,slot:document.getElementById('att-slot').value,time:document.getElementById('att-time').value,coach:document.getElementById('att-coach').value,focus:document.getElementById('att-focus').value,
+    records:DB.athletes.map(a=>({athleteId:a.id,status:document.getElementById('as-'+a.id).value,note:(document.getElementById('an-'+a.id)||{}).value||''}))};
+  ADB.sessions.unshift(sess);sADB();closeM('mo-att');refresh();
+}
+
+// ============================================================
+// FINANCE
+// ============================================================
+function renderFin(a){
+  const ns=document.getElementById('ns-fin'),fc=document.getElementById('fc');
+  if(!a){ns.classList.remove('hidden');fc.classList.add('hidden');return;}
+  ns.classList.add('hidden');fc.classList.remove('hidden');
+  document.getElementById('fb').innerHTML=mkBanner(a);
+  const enr=FDB.enrollments.find(x=>x.athleteId===a.id&&x.active);
+  const pkg=enr?FDB.packages.find(x=>x.id===enr.packageId):null;
+  const pays=FDB.payments.filter(x=>x.athleteId===a.id).sort((a,b)=>new Date(b.dueDate)-new Date(a.dueDate));
+  const cc=chipC(pkg?.color||'blue');
+
+  // Package info
+  document.getElementById('fpkg').innerHTML=pkg?`<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <div><span class="chip ${cc}">${pkg.name}</span></div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--a)">${fmtLKR(pkg.price)}<span style="font-size:10px;color:var(--t3);font-family:'Sora',sans-serif">/month</span></div>
+    <div style="font-size:10px;color:var(--t2)">${pkg.sessionsPerWeek} sessions/wk · ${pkg.durationMonths} month(s)<br>${pkg.description}</div>
+    <div style="font-size:9px;color:var(--t3)">Enrolled: ${enr.startDate} → ${enr.endDate}</div>
+  </div>`:'<div style="font-size:11px;color:var(--t3)">No active package. <span style="color:var(--a);cursor:pointer" onclick="openEnrollModal()">+ Enroll now</span></div>';
+
+  // Revenue bar chart
+  dChart('crev');
+  const paid=pays.filter(x=>x.status==='paid');
+  const revMo={};paid.forEach(p=>{revMo[p.month]=(revMo[p.month]||0)+p.amount;});
+  const rkeys=Object.keys(revMo).reverse();
+  CHS['crev']=new Chart(document.getElementById('crev').getContext('2d'),{type:'bar',data:{labels:rkeys,datasets:[{label:'Paid (LKR)',data:rkeys.map(k=>revMo[k]),backgroundColor:'rgba(14,165,233,.7)',borderColor:'#0EA5E9',borderWidth:1,borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'#1A2840'},ticks:{color:'#3A5F7A',font:{size:9}}},y:{grid:{color:'#1A2840'},ticks:{color:'#3A5F7A',font:{size:9},callback:v=>'Rs.'+v.toLocaleString()}}}}});
+
+  // Summary
+  const tot=paid.reduce((s,x)=>s+x.amount,0);
+  const pend=pays.filter(x=>x.status==='pending').reduce((s,x)=>s+x.amount,0);
+  const ov=pays.filter(x=>x.status==='overdue').reduce((s,x)=>s+x.amount,0);
+  document.getElementById('fsum').innerHTML=`
+    <div class="g2" style="gap:.5rem;margin-top:.3rem">
+      <div class="dsc"><div class="dsbig" style="color:var(--a2);font-size:20px">${fmtLKR(tot)}</div><div class="dslbl">Total Paid</div></div>
+      <div class="dsc"><div class="dsbig" style="color:var(--a4);font-size:20px">${fmtLKR(pend)}</div><div class="dslbl">Pending</div></div>
+      <div class="dsc"><div class="dsbig" style="color:var(--danger);font-size:20px">${fmtLKR(ov)}</div><div class="dslbl">Overdue</div></div>
+      <div class="dsc"><div class="dsbig" style="font-size:20px">${pays.length}</div><div class="dslbl">Total Records</div></div>
+    </div>`;
+
+  // Table
+  const isAC=CU.role==='admin'||CU.role==='coach';
+  document.getElementById('ftb').innerHTML=pays.map(p=>`<tr>
+    <td style="font-weight:500">${p.month}</td>
+    <td style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--a2)">${fmtLKR(p.amount)}</td>
+    <td style="color:var(--t2)">${p.dueDate}</td>
+    <td style="color:var(--t2)">${p.date||'—'}</td>
+    <td style="color:var(--t3);font-size:10px">${p.method||'—'}</td>
+    <td><span class="sp sp-${p.status}">${p.status.toUpperCase()}</span></td>
+    <td style="color:var(--t3);font-size:10px">${p.receiptNo||'—'}</td>
+    ${isAC?`<td style="white-space:nowrap">
+      ${p.status!=='paid'?`<button class="btn btn-g btn-xs" style="margin-right:3px" onclick="markPaid('${p.id}')">✓ Mark Paid</button>`:''}
+      <button class="btn-print btn-xs" onclick="genReceipt('${p.id}')">🖨</button>
+      <button class="delbtn" onclick="delPay('${p.id}')">🗑</button>
+    </td>`:'<td></td>'}
+  </tr>`).join('');
+}
+
+function markPaid(pid){
+  const p=FDB.payments.find(x=>x.id===pid);if(!p)return;
+  p.status='paid';p.date=new Date().toISOString().slice(0,10);p.receiptNo='RCP-'+Date.now().toString().slice(-6);
+  sFDB();updateOvBadge();renderFin(getA());
+}
+function delPay(id){if(!confirm('Delete this payment record?'))return;FDB.payments=FDB.payments.filter(x=>x.id!==id);sFDB();updateOvBadge();renderFin(getA());}
+function openPayModal(){
+  const a=getA();if(!a)return;
+  const pkgSel=document.getElementById('py-pkg');
+  pkgSel.innerHTML=FDB.packages.filter(x=>x.active).map(p=>`<option value="${p.id}">${p.name} — ${fmtLKR(p.price)}</option>`).join('');
+  const enr=FDB.enrollments.find(x=>x.athleteId===a.id&&x.active);
+  if(enr)pkgSel.value=enr.packageId;
+  const td=new Date().toISOString().slice(0,10);
+  document.getElementById('py-due').value=td;document.getElementById('py-paid').value=td;
+  ['py-month','py-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('py-amt').value='';
+  document.getElementById('mo-pay').classList.add('open');
+}
+function savePay(){
+  const a=getA();if(!a)return;
+  const pid=document.getElementById('py-pkg').value;
+  const st=document.getElementById('py-status').value;
+  const pay={id:'pay'+Date.now(),athleteId:a.id,packageId:pid,amount:parseFloat(document.getElementById('py-amt').value)||0,date:st==='paid'?document.getElementById('py-paid').value:null,dueDate:document.getElementById('py-due').value,status:st,method:document.getElementById('py-method').value,receiptNo:st==='paid'?'RCP-'+Date.now().toString().slice(-6):null,month:document.getElementById('py-month').value,notes:document.getElementById('py-notes').value};
+  FDB.payments.unshift(pay);sFDB();updateOvBadge();closeM('mo-pay');renderFin(a);
+}
+function openEnrollModal(){
+  const a=getA();if(!a)return;
+  selectedEnrollPkg=null;
+  document.getElementById('enroll-pkgs').innerHTML=FDB.packages.filter(x=>x.active).map(p=>`<div class="pkgc" id="epkg-${p.id}" onclick="selEPkg('${p.id}')">
+    <div class="pkgname">${p.name}</div>
+    <div class="pkgprice">${fmtLKR(p.price)}<span style="font-size:10px;color:var(--t3);font-family:'Sora',sans-serif">/mo</span></div>
+    <div class="pkgdesc">${p.description}</div>
+    <div class="pkgdet">${p.sessionsPerWeek} sessions/wk · ${p.durationMonths} month(s)</div>
+  </div>`).join('');
+  const td=new Date().toISOString().slice(0,10);
+  document.getElementById('enr-start').value=td;document.getElementById('enr-end').value='';
+  document.getElementById('mo-enroll').classList.add('open');
+}
+function selEPkg(id){
+  selectedEnrollPkg=id;
+  document.querySelectorAll('.pkgc').forEach(el=>el.classList.remove('sel'));
+  const el=document.getElementById('epkg-'+id);if(el)el.classList.add('sel');
+  const pkg=FDB.packages.find(x=>x.id===id);
+  if(pkg){
+    const s=new Date(document.getElementById('enr-start').value||new Date());
+    const e=new Date(s);e.setMonth(e.getMonth()+pkg.durationMonths);
+    document.getElementById('enr-end').value=e.toISOString().slice(0,10);
+  }
+}
+function saveEnroll(){
+  const a=getA();if(!a||!selectedEnrollPkg){alert('Please select a package.');return;}
+  FDB.enrollments.forEach(e=>{if(e.athleteId===a.id)e.active=false;});
+  FDB.enrollments.push({id:'enr'+Date.now(),athleteId:a.id,packageId:selectedEnrollPkg,startDate:document.getElementById('enr-start').value,endDate:document.getElementById('enr-end').value,autoRenew:document.getElementById('enr-auto').value==='1',active:true});
+  sFDB();closeM('mo-enroll');renderFin(a);
+}
+
+// INVOICE / RECEIPT PRINT
+function genReceipt(pid){
+  const p=FDB.payments.find(x=>x.id===pid);if(!p)return;
+  const a=DB.athletes.find(x=>x.id===p.athleteId);
+  const pkg=FDB.packages.find(x=>x.id===p.packageId);
+  const ic=document.getElementById('invoice-content');
+  ic.innerHTML=`<div style="max-width:600px;margin:0 auto;padding:2rem;background:#fff;color:#000;font-family:'Sora',sans-serif">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;border-bottom:3px solid #0EA5E9;padding-bottom:1rem">
+      <div><div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:#0EA5E9">SWIM<span style="color:#10B981">IQ</span></div><div style="font-size:11px;color:#666">Swim School Management</div></div>
+      <div style="text-align:right"><div style="font-size:14px;font-weight:700">PAYMENT RECEIPT</div><div style="font-size:11px;color:#666">${p.receiptNo||'—'}</div><div style="font-size:11px;color:#666">Date: ${p.date||p.dueDate}</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem">
+      <div><div style="font-size:11px;font-weight:700;color:#0EA5E9;text-transform:uppercase;margin-bottom:.5rem">Billed To</div><div style="font-weight:600">${a?.name||'—'}</div><div style="font-size:11px;color:#666">${a?.email||''}</div><div style="font-size:11px;color:#666">${a?.phone||''}</div><div style="font-size:11px;color:#666">${a?.club||''}</div></div>
+      <div><div style="font-size:11px;font-weight:700;color:#0EA5E9;text-transform:uppercase;margin-bottom:.5rem">Payment Info</div><div style="font-size:11px"><strong>Period:</strong> ${p.month}</div><div style="font-size:11px"><strong>Method:</strong> ${p.method||'—'}</div><div style="font-size:11px"><strong>Due:</strong> ${p.dueDate}</div><div style="font-size:11px"><strong>Paid:</strong> ${p.date||'—'}</div></div>
+    </div>
+    <table style="width:100%;border-collapse:collapse;margin-bottom:1.5rem">
+      <thead><tr style="background:#f0f9ff"><th style="padding:.6rem .8rem;text-align:left;font-size:11px;font-weight:700;color:#0EA5E9;border-bottom:2px solid #0EA5E9">Description</th><th style="padding:.6rem .8rem;text-align:right;font-size:11px;font-weight:700;color:#0EA5E9;border-bottom:2px solid #0EA5E9">Amount</th></tr></thead>
+      <tbody><tr><td style="padding:.6rem .8rem;border-bottom:1px solid #eee;font-size:12px">${pkg?.name||'Swim Coaching'} — ${p.month}${pkg?`<div style='font-size:10px;color:#666'>${pkg.description} · ${pkg.sessionsPerWeek} sessions/week</div>`:''}</td><td style="padding:.6rem .8rem;border-bottom:1px solid #eee;text-align:right;font-weight:700;font-size:14px">Rs. ${p.amount.toLocaleString()}</td></tr></tbody>
+      <tfoot><tr style="background:#f0f9ff"><td style="padding:.6rem .8rem;font-weight:700">TOTAL</td><td style="padding:.6rem .8rem;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:22px;color:#0EA5E9">Rs. ${p.amount.toLocaleString()}</td></tr></tfoot>
+    </table>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div style="font-size:11px;color:#666">Thank you for your payment.</div>
+      <div style="padding:4px 14px;border-radius:20px;background:${p.status==='paid'?'#d1fae5':'#fef3c7'};color:${p.status==='paid'?'#065f46':'#92400e'};font-size:11px;font-weight:700">${p.status.toUpperCase()}</div>
+    </div>
+  </div>`;
+  ic.style.display='block';window.print();ic.style.display='none';
+}
+function printInvoice(){const a=getA();if(!a)return;const last=FDB.payments.filter(x=>x.athleteId===a.id)[0];if(last)genReceipt(last.id);}
+
+// ============================================================
+// ANALYSIS
+// ============================================================
+function renderAnSec(a){
+  const ns=document.getElementById('ns-an'),ac=document.getElementById('anc');
+  if(!a){ns.classList.remove('hidden');ac.classList.add('hidden');return;}
+  ns.classList.add('hidden');ac.classList.remove('hidden');
+  document.getElementById('anb').innerHTML=mkBanner(a);
+  // Init manual form on first load
+  if(!document.getElementById('m-date').value){
+    document.getElementById('m-date').value=new Date().toISOString().slice(0,10);
+    buildManualScoresGrid();
+  }
+  // Athletes default to manual mode (no AI key access)
+  if(CU&&(CU.role==='athlete'||CU.role==='parent')){
+    switchAnMode('manual');
+    document.getElementById('an-mode-ai').style.display='none';
+  }
+}
+function setAT(t){AT=t;document.querySelectorAll('.atab').forEach(x=>x.classList.remove('act'));document.getElementById('atab-'+t).classList.add('act');}
+function handleFile(e){const f=e.target.files[0];if(!f)return;CF=f;const isI=f.type.startsWith('image/');document.getElementById('prev-area').classList.remove('hidden');document.getElementById('upz').classList.add('hidden');document.getElementById('fname').textContent=f.name+' ('+Math.round(f.size/1024)+' KB)';const ip=document.getElementById('iprev'),vp=document.getElementById('vprev');if(isI){ip.src=URL.createObjectURL(f);ip.classList.remove('hidden');vp.classList.add('hidden');}else{vp.src=URL.createObjectURL(f);vp.classList.remove('hidden');ip.classList.add('hidden');}}
+function onDrag(e){e.preventDefault();document.getElementById('upz').classList.add('drag');}
+function offDrag(){document.getElementById('upz').classList.remove('drag');}
+function onDrop(e){e.preventDefault();offDrag();if(e.dataTransfer.files[0])handleFile({target:{files:e.dataTransfer.files}});}
+function clearFile(){CF=null;document.getElementById('prev-area').classList.add('hidden');document.getElementById('upz').classList.remove('hidden');['iprev','vprev'].forEach(id=>{const el=document.getElementById(id);if(el){el.src='';el.classList.add('hidden');}});document.getElementById('ffile').value='';document.getElementById('an-out').innerHTML='';}
+
+async function runAnalysis(){
+  const a=getA();if(!a)return;
+  const notes=document.getElementById('an-notes').value,apiKey=document.getElementById('api-key').value.trim();
+  const out=document.getElementById('an-out');
+  const TL={stroke:'Stroke Technique',start:'Start & Dive',turn:'Turns & Walls',full:'Full Race Review'}[AT];
+  out.innerHTML=`<div class="card"><div style="text-align:center;padding:1.5rem"><div class="wave"><span></span><span></span><span></span><span></span><span></span></div><div style="font-size:13px;font-weight:600">Analyzing ${TL}...</div><div style="font-size:10px;color:var(--t2);margin-top:4px">${a.name} · ${a.stroke}</div></div></div>`;
+  try{
+    let r=null;
+    if(apiKey&&CF&&CF.type.startsWith('image/'))r=await callClaude(apiKey,a,notes,AT,CF);
+    if(!r)r=genDemo(a,AT);
+    renderRep(r,a,AT);
+  }catch(e){console.error(e);renderRep(genDemo(a,AT),a,AT);}
+}
+function f2b64(f){return new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(f);});}
+async function callClaude(apiKey,a,notes,type,file){
+  const pr=`You are an expert swimming coach analyzing ${a.name}, ${calcAgeFromDob(a.dob)}-year-old ${a.level} ${a.stroke} swimmer. Perform ${type} analysis. Notes: "${notes||'none'}". Goals: "${a.goals||'improve'}". Respond ONLY with valid JSON (no markdown): {"overallScore":<int 0-100>,"summary":"<2-3 sentences>","techniqueScores":[{"name":"<aspect>","score":<int>}],"weakAreas":["<weakness>"],"strengths":["<strength>"],"improvements":[{"title":"<t>","desc":"<2-3 sentence advice>"}],"fixWorkouts":[{"drill":"<n>","reps":"<reps>","focus":"<what it corrects>"}]}`;
+  const b64=await f2b64(file);
+  const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:2000,messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:file.type,data:b64}},{type:'text',text:pr}]}]})});
+  if(!resp.ok)throw new Error('API '+resp.status);
+  const d=await resp.json();const tx=d.content.map(c=>c.text||'').join('').replace(/```json|```/g,'').trim();const p=JSON.parse(tx);
+  return{overallScore:p.overallScore,summary:p.summary,techniqueScores:p.techniqueScores,weakAreas:p.weakAreas||[],strengths:p.strengths||[],improvements:p.improvements||[],fixWorkouts:p.fixWorkouts||[]};
+}
+function genDemo(a,type){
+  const v=()=>Math.floor(Math.random()*18)+62;
+  const DD={Freestyle:{asp:['Body Position','Catch Mechanics','Kick Technique','Breathing Pattern','Stroke Timing','Hip Rotation'],wk:['Head position too high','Crossover on hand entry','Short catch'],st:['Two-beat kick','Bilateral breathing'],imp:[{title:'Neutral Head Alignment',desc:'Ears between arms. Only mouth clears water to breathe.'},{title:'High-Elbow Catch',desc:'Fingertips down, elbow high. Engages lats for max propulsion.'}],dr:[{drill:'Catch-up drill',reps:'6×50m',focus:'Corrects crossover'},{drill:'Fist drill',reps:'4×100m',focus:'High-elbow feel'},{drill:'6-3-6 rotation',reps:'4×75m',focus:'Hip rotation timing'}]},
+    Butterfly:{asp:['Body Undulation','Arm Pull Width','Kick Timing','Breathing Frequency','Entry Position','Hip Drive'],wk:['Late kick timing','Wide arm entry'],st:['Strong hip drive','Arm pull width'],imp:[{title:'Two-Beat Kick Timing',desc:'Kicks land as hands enter — first at entry, second at release.'},{title:'Shoulder-Width Entry',desc:'Enter with thumbs angled in. Crossover wastes energy.'}],dr:[{drill:'Fly kick on back',reps:'8×25m',focus:'Isolated undulation'},{drill:'One-arm fly',reps:'6×50m',focus:'Entry width & timing'}]},
+    Backstroke:{asp:['Body Rotation','Entry Position','Pull Path','Kick Consistency','Finish','Head Position'],wk:['Entry crossing midline','Bent-elbow finish'],st:['Good body rotation','6-beat kick'],imp:[{title:'Little-Finger Entry',desc:'Enter pinky-first at shoulder width.'},{title:'Straight-Arm Finish',desc:'Sweep thumb to hip with full extension.'}],dr:[{drill:'Double-arm backstroke',reps:'8×25m',focus:'Entry width'},{drill:'Single-arm backstroke',reps:'6×50m',focus:'Pull path isolation'}]},
+    Breaststroke:{asp:['Pullout Mechanics','Arm Pull Timing','Kick Width','Glide Phase','Head Position','Cycle Tempo'],wk:['Glide phase cut short','Kick too narrow'],st:['Powerful pullout','Good head position'],imp:[{title:'Hold the Glide',desc:"Count 'one-thousand' before pull. 0.3s longer glide reduces drag."},{title:'Wider Kick',desc:'Flex feet outward — wider catch generates more propulsion.'}],dr:[{drill:'2-kick 1-pull',reps:'6×50m',focus:'Longer glide'},{drill:'Breaststroke kick only',reps:'8×25m',focus:'Kick width & snap'}]},
+    IM:{asp:['Fly Efficiency','Back Rotation','Breast Glide','Free Pacing','Transitions','Endurance'],wk:['Butterfly energy too high','Back-breast transition'],st:['Strong free base','Good conditioning'],imp:[{title:'Fly Conservation',desc:'Swim fly at 85-90% effort — saves energy for breaststroke.'},{title:'Back-Breast Transition',desc:'Touch with two hands, tuck chin, push off on back before rotating.'}],dr:[{drill:'IM transition sets',reps:'6×50m',focus:'Fly-back & back-breast turns'}]}};
+  const SD={asp:['Block Reaction','Take-off Angle','Entry Position','Underwater Kick','Breakout Timing','First Stroke'],wk:['Reaction slow','Dive angle too shallow','Underwater too short'],st:['Good arm swing','Tight streamline'],imp:[{title:'Pre-load the Block',desc:'Apply 30% forward pressure on rear foot before signal.'},{title:'Entry Angle 35–40°',desc:'Drive hips forward and up. Shallow entries lose 0.3–0.5m.'}],dr:[{drill:'Block reaction starts',reps:'12 starts',focus:'Explosive first movement'},{drill:'Target angle dives',reps:'10×dive',focus:'35–40° entry'}]};
+  const data=(type==='start')?SD:(DD[a.stroke]||DD.Freestyle);
+  return{overallScore:v(),summary:`${a.name} shows ${a.level==='Elite'?'elite':'solid'} ${a.stroke.toLowerCase()} potential with clear technique improvements available. Focused drill work over 6–8 weeks targeting the identified weaknesses will yield meaningful performance gains.`,techniqueScores:data.asp.map(n=>({name:n,score:v()})),weakAreas:data.wk,strengths:data.st,improvements:data.imp,fixWorkouts:data.dr};
+}
+function renderRep(r,a,type){
+  const date=new Date().toISOString().slice(0,10);
+  const TL={stroke:'Stroke Technique',start:'Start & Dive',turn:'Turns & Walls',full:'Full Race Review'}[type];
+  const entry={id:Date.now(),athleteId:a.id,date,score:r.overallScore,type,typeLabel:TL,title:`${a.stroke} — ${TL}`,summary:r.summary,techniqueScores:r.techniqueScores,weaknesses:r.weakAreas,strengths:r.strengths,improvements:r.improvements,fixWorkouts:r.fixWorkouts};
+  DB.analyses.unshift(entry);sDB();
+  const bC=r.overallScore>=80?'var(--a2)':r.overallScore>=55?'var(--a4)':'var(--danger)';
+  document.getElementById('an-out').innerHTML=`
+    <div class="card">
+      <div class="flex-b mb" style="gap:1rem">
+        <div><div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px">Analysis Complete</div><div style="font-size:10px;color:var(--t2)">${a.name} · ${TL} · ${date}</div></div>
+        <div style="text-align:center;flex-shrink:0"><div style="font-family:'Bebas Neue',sans-serif;font-size:52px;color:${bC};line-height:1">${r.overallScore}</div><div style="font-size:9px;color:var(--t3)">/100</div></div>
+      </div>
+      <p style="font-size:11px;color:var(--t2);line-height:1.6;padding:.7rem;background:var(--s2);border-radius:var(--r);border-left:3px solid var(--a);margin-bottom:.85rem">${r.summary}</p>
+      <div class="slbl">Technique Breakdown</div>
+      ${r.techniqueScores.map(s=>`<div class="srow"><div class="slb">${s.name}</div><div class="str"><div class="sf ${scC(s.score)}" style="width:${s.score}%"></div></div><div class="sval" style="color:${scTx(s.score)}">${s.score}</div></div>`).join('')}
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-top:.65rem">
+        <div><div class="slbl">Weak Areas</div>${r.weakAreas.map(w=>`<span class="tag tag-d">⚠ ${w}</span>`).join('')}</div>
+        <div><div class="slbl">Strengths</div>${r.strengths.map(s=>`<span class="tag tag-s">✓ ${s}</span>`).join('')}</div>
+      </div>
+    </div>
+    <div class="card"><div class="slbl">Improvement Techniques</div>${r.improvements.map((imp,i)=>`<div class="ii"><div class="inum">${i+1}</div><div><div class="ititle">${imp.title}</div><div class="idesc">${imp.desc}</div></div></div>`).join('')}</div>
+    <div class="card"><div class="slbl">Corrective Drills</div>${r.fixWorkouts.map((f,i)=>`<div class="di"><div class="dnum">${i+1}</div><div><div class="dn">${f.drill} <span style="font-size:9px;color:var(--t2)">· ${f.reps}</span></div><div class="dm">${f.focus}</div></div></div>`).join('')}</div>`;
+}
+
+// ============================================================
+// HISTORY
+// ============================================================
+function renderHist(a){
+  const ns=document.getElementById('ns-hist'),hc=document.getElementById('hc');
+  if(!a){ns.classList.remove('hidden');hc.classList.add('hidden');return;}
+  ns.classList.add('hidden');hc.classList.remove('hidden');
+  document.getElementById('hb').innerHTML=mkBanner(a);
+  const recs=DB.analyses.filter(x=>x.athleteId===a.id);
+
+  // Multi-line score trend
+  dChart('csh');
+  if(recs.length>=2){
+    const sorted=recs.slice().reverse();
+    const dims=[...new Set(sorted.flatMap(r=>(r.techniqueScores||[]).map(s=>s.name)))];
+    const DC=['#0EA5E9','#10B981','#8B5CF6','#F59E0B','#EF4444','#06B6D4'];
+    const datasets=[
+      {label:'Overall',data:sorted.map(r=>r.score),borderColor:'#fff',borderWidth:2.5,tension:.4,fill:false,pointRadius:5,pointHoverRadius:7},
+      ...dims.slice(0,5).map((dim,i)=>({label:dim,data:sorted.map(r=>{const t=(r.techniqueScores||[]).find(s=>s.name===dim);return t?t.score:null;}),borderColor:DC[i]||'#60A5FA',borderWidth:1.5,tension:.4,fill:false,pointRadius:3,borderDash:i%2===0?[]:[5,3]}))
+    ];
+    CHS['csh']=new Chart(document.getElementById('csh').getContext('2d'),{type:'line',data:{labels:sorted.map(r=>r.date.slice(5)),datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#7BAAC8',font:{size:9},boxWidth:10,padding:8}}},scales:{y:{min:40,max:100,grid:{color:'#1A2840'},ticks:{color:'#3A5F7A',font:{size:9}}},x:{grid:{color:'#1A2840'},ticks:{color:'#3A5F7A',font:{size:9}}}}}});
+  }
+
+  document.getElementById('hlist').innerHTML=recs.length?recs.map(e=>`<div class="hi" onclick="openRep(${e.id})">
+    <div class="hiscore" style="color:${scTx(e.score)}">${e.score}</div>
+    <div style="flex:1">
+      <div class="hidate">${e.date} · ${e.typeLabel||e.type}</div>
+      <div class="hititle">${e.title}</div>
+      <div class="hitags">${(e.weaknesses||[]).slice(0,2).map(w=>`<span class="tag tag-d">⚠ ${w}</span>`).join('')}${(e.strengths||[]).slice(0,1).map(s=>`<span class="tag tag-s">✓ ${s}</span>`).join('')}</div>
+    </div><div style="color:var(--t3);font-size:14px">›</div>
+  </div>`).join(''):'<div class="empty"><span class="eico">📋</span><div class="ettl">No analyses yet</div><div class="esub">Run an AI analysis to get started.</div></div>';
+}
+function openRep(id){
+  const e=DB.analyses.find(x=>x.id===id);if(!e)return;
+  const a=DB.athletes.find(x=>x.id===e.athleteId);
+  document.getElementById('rep-title').textContent=(a?a.name+' — ':'')+e.title;
+  document.getElementById('rep-body').innerHTML=`
+    <div style="text-align:center;margin-bottom:.75rem"><div style="font-family:'Bebas Neue',sans-serif;font-size:56px;color:${scTx(e.score)};line-height:1">${e.score}</div><div style="font-size:10px;color:var(--t2)">${e.date} · ${e.typeLabel}</div></div>
+    ${e.summary?`<p style="font-size:11px;color:var(--t2);line-height:1.6;padding:.65rem;background:var(--s2);border-radius:var(--r);margin-bottom:.75rem;border-left:3px solid var(--a)">${e.summary}</p>`:''}
+    <div class="slbl">Technique Scores</div>
+    ${(e.techniqueScores||[]).map(s=>`<div class="srow"><div class="slb">${s.name}</div><div class="str"><div class="sf ${scC(s.score)}" style="width:${s.score}%"></div></div><div class="sval" style="color:${scTx(s.score)}">${s.score}</div></div>`).join('')}
+    ${(e.improvements||[]).length?`<div class="slbl mt">Improvement Techniques</div>${e.improvements.map((imp,i)=>`<div class="ii"><div class="inum">${i+1}</div><div><div class="ititle">${imp.title}</div><div class="idesc">${imp.desc}</div></div></div>`).join('')}`:''}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin:.65rem 0">
+      <div><div class="slbl">Weak Areas</div>${(e.weaknesses||[]).map(w=>`<span class="tag tag-d">⚠ ${w}</span>`).join('')||'<span style="font-size:10px;color:var(--t3)">None noted</span>'}</div>
+      <div><div class="slbl">Strengths</div>${(e.strengths||[]).map(s=>`<span class="tag tag-s">✓ ${s}</span>`).join('')||'<span style="font-size:10px;color:var(--t3)">None noted</span>'}</div>
+    </div>
+    ${(e.fixWorkouts||[]).length?`<div class="slbl">Corrective Drills</div>${e.fixWorkouts.map((f,i)=>`<div class="di"><div class="dnum">${i+1}</div><div><div class="dn">${f.drill} <span style="font-size:9px;color:var(--t2)">${f.reps||''}</span></div><div class="dm">${f.focus}</div></div></div>`).join('')}`:''}
+    <div style="margin-top:.85rem;text-align:right"><button class="btn-danger" onclick="delRep(${e.id})">🗑 Delete Report</button></div>`;
+  document.getElementById('mo-report').classList.add('open');
+}
+function delRep(id){if(!confirm('Delete this report?'))return;DB.analyses=DB.analyses.filter(x=>x.id!==id);sDB();closeM('mo-report');renderHist(getA());if(CS==='dashboard')renderDash(getA());}
+
+// ============================================================
+// USERS
+// ============================================================
+function renderUsers(){
+  const RB={admin:'rb-admin',coach:'rb-coach',athlete:'rb-athlete',parent:'rb-parent'};
+  document.getElementById('utb').innerHTML=UDB.users.map(u=>`<tr>
+    <td style="font-weight:600">${u.name}</td>
+    <td style="color:var(--t2)">${u.username}</td>
+    <td><span class="rbadge ${RB[u.role]||'rb-athlete'}">${u.role}</span></td>
+    <td style="color:var(--t3);font-size:10px">${u.email||'—'}</td>
+    <td style="color:var(--t2);font-size:10px">${u.athleteId?DB.athletes.find(x=>x.id===u.athleteId)?.name||u.athleteId:u.linkedAthleteIds?.map(id=>DB.athletes.find(x=>x.id===id)?.name||id).join(', ')||'—'}</td>
+    <td><span class="sp ${u.active?'sp-paid':'sp-absent'}">${u.active?'Active':'Inactive'}</span></td>
+    <td><button class="btn btn-sm" onclick="openEditU('${u.id}')">Edit</button></td>
+  </tr>`).join('');
+}
+function refreshUAthlSel(selId){
+  const s=document.getElementById('u-athl');s.innerHTML='<option value="">— None —</option>'+DB.athletes.map(a=>`<option value="${a.id}"${selId===a.id?' selected':''}>${a.name}</option>`).join('');
+}
+function openAddUser(){EUid=null;['u-name','u-un','u-email','u-phone'].forEach(id=>document.getElementById(id).value='');document.getElementById('u-pw').value='';document.getElementById('u-role').value='athlete';refreshUAthlSel(null);document.getElementById('mo-u-title').textContent='Add User';document.getElementById('del-u-btn').classList.add('hidden');document.getElementById('mo-user').classList.add('open');}
+function openEditU(id){EUid=id;const u=UDB.users.find(x=>x.id===id);if(!u)return;document.getElementById('u-name').value=u.name||'';document.getElementById('u-un').value=u.username||'';document.getElementById('u-pw').value=u.password||'';document.getElementById('u-role').value=u.role||'athlete';document.getElementById('u-email').value=u.email||'';document.getElementById('u-phone').value=u.phone||'';refreshUAthlSel(u.athleteId||u.linkedAthleteIds?.[0]||null);document.getElementById('mo-u-title').textContent='Edit User';document.getElementById('del-u-btn').classList.remove('hidden');document.getElementById('mo-user').classList.add('open');}
+function saveUser(){
+  const name=document.getElementById('u-name').value.trim(),un=document.getElementById('u-un').value.trim(),pw=document.getElementById('u-pw').value;
+  if(!name||!un||!pw){alert('Name, username and password are required.');return;}
+  const role=document.getElementById('u-role').value,aid=parseInt(document.getElementById('u-athl').value)||null;
+  if(EUid){const u=UDB.users.find(x=>x.id===EUid);if(u)Object.assign(u,{name,username:un,password:pw,role,email:document.getElementById('u-email').value,phone:document.getElementById('u-phone').value,athleteId:role==='athlete'?aid:null,linkedAthleteIds:role==='parent'&&aid?[aid]:[]});}
+  else UDB.users.push({id:'u'+Date.now(),username:un,password:pw,role,name,email:document.getElementById('u-email').value,phone:document.getElementById('u-phone').value,athleteId:role==='athlete'?aid:null,linkedAthleteIds:role==='parent'&&aid?[aid]:[],active:true,createdAt:new Date().toISOString().slice(0,10)});
+  sUDB();closeM('mo-user');renderUsers();
+}
+function delUser(){if(!EUid)return;if(!confirm('Delete this user?'))return;UDB.users=UDB.users.filter(x=>x.id!==EUid);sUDB();closeM('mo-user');renderUsers();}
+
+// ============================================================
+// PACKAGES
+// ============================================================
+function renderPkgs(){
+  const cc={blue:'ch-b',teal:'ch-t',coral:'ch-c',purple:'ch-p'};
+  document.getElementById('pkggrid').innerHTML=FDB.packages.map(p=>`<div class="pkgc" onclick="openEditPkg('${p.id}')">
+    <span class="chip ${cc[p.color]||'ch-b'}" style="font-size:9px">${p.name}</span>
+    <div class="pkgprice">${fmtLKR(p.price)}<span style="font-size:10px;color:var(--t3);font-family:'Sora',sans-serif">/mo</span></div>
+    <div class="pkgdesc">${p.description}</div>
+    <div class="pkgdet">🏊 ${p.sessionsPerWeek} sessions/wk · 📅 ${p.durationMonths} month(s)</div>
+    <div style="margin-top:.55rem;font-size:9px;color:var(--t3)">${FDB.enrollments.filter(x=>x.packageId===p.id&&x.active).length} active enrollments</div>
+  </div>`).join('');
+  // Revenue by package
+  dChart('crv');
+  const revPkg={};FDB.payments.filter(x=>x.status==='paid').forEach(p=>{const pkg=FDB.packages.find(x=>x.id===p.packageId);const n=pkg?pkg.name:'Other';revPkg[n]=(revPkg[n]||0)+p.amount;});
+  const pn=Object.keys(revPkg);
+  CHS['crv']=new Chart(document.getElementById('crv').getContext('2d'),{type:'bar',data:{labels:pn,datasets:[{label:'Revenue (LKR)',data:pn.map(k=>revPkg[k]),backgroundColor:['rgba(14,165,233,.7)','rgba(16,185,129,.7)','rgba(239,68,68,.7)','rgba(139,92,246,.7)'],borderRadius:6,borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'#1A2840'},ticks:{color:'#3A5F7A',font:{size:9}}},y:{grid:{color:'#1A2840'},ticks:{color:'#3A5F7A',font:{size:9},callback:v=>'Rs.'+v.toLocaleString()}}}}});
+}
+function openAddPkg(){EPid=null;['pk-name','pk-desc','pk-price','pk-spw','pk-dur'].forEach(id=>document.getElementById(id).value='');document.getElementById('mo-p-title').textContent='Add Package';document.getElementById('mo-pkg').classList.add('open');}
+function openEditPkg(id){EPid=id;const p=FDB.packages.find(x=>x.id===id);if(!p)return;document.getElementById('pk-name').value=p.name;document.getElementById('pk-desc').value=p.description;document.getElementById('pk-price').value=p.price;document.getElementById('pk-spw').value=p.sessionsPerWeek;document.getElementById('pk-dur').value=p.durationMonths;document.getElementById('mo-p-title').textContent='Edit Package';document.getElementById('mo-pkg').classList.add('open');}
+function savePkg(){const n=document.getElementById('pk-name').value.trim();if(!n){alert('Name required.');return;}const data={name:n,description:document.getElementById('pk-desc').value.trim(),price:parseFloat(document.getElementById('pk-price').value)||0,sessionsPerWeek:parseInt(document.getElementById('pk-spw').value)||5,durationMonths:parseInt(document.getElementById('pk-dur').value)||1,active:true};if(EPid){const p=FDB.packages.find(x=>x.id===EPid);if(p)Object.assign(p,data);}else FDB.packages.push({id:'pkg'+Date.now(),color:'blue',...data});sFDB();closeM('mo-pkg');renderPkgs();}
+
+// ============================================================
+// ATHLETE CRUD
+// ============================================================
+function calcAge(){const dob=document.getElementById('f-dob').value,d=document.getElementById('agedp');if(!dob){d.textContent='—';return;}const age=calcAgeFromDob(dob);d.textContent=(age!==null?age:'?')+' yrs';}
+function handlePhoto(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{PP=ev.target.result;document.getElementById('phup').innerHTML=`<img src="${PP}" alt="photo" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;};r.readAsDataURL(f);}
+function openAddA(){EAid=null;PP=null;document.getElementById('phup').innerHTML='📷';['f-name','f-club','f-goals','f-email','f-phone','f-emergency','f-notes'].forEach(id=>document.getElementById(id).value='');document.getElementById('f-dob').value='';document.getElementById('agedp').textContent='—';document.getElementById('mo-a-title').textContent='Add Athlete';document.getElementById('del-a-btn').classList.add('hidden');document.getElementById('mo-athlete').classList.add('open');}
+function openEditA(id){EAid=id;const a=DB.athletes.find(x=>x.id===id);if(!a)return;PP=a.photo||null;['f-name','f-club','f-goals','f-email','f-phone','f-emergency','f-notes'].forEach(fid=>{const key=fid.replace('f-','');if(key==='name')document.getElementById(fid).value=a.name||'';else if(key==='emergency')document.getElementById(fid).value=a.emergencyContact||'';else document.getElementById(fid).value=a[key]||'';});document.getElementById('f-dob').value=a.dob||'';document.getElementById('f-stroke').value=a.stroke||'Freestyle';document.getElementById('f-level').value=a.level||'Intermediate';document.getElementById('f-gender').value=a.gender||'Male';calcAge();const ph=document.getElementById('phup');ph.innerHTML=a.photo?`<img src="${a.photo}" alt="photo" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:'📷';document.getElementById('mo-a-title').textContent='Edit Athlete';document.getElementById('del-a-btn').classList.remove('hidden');document.getElementById('mo-athlete').classList.add('open');}
+function saveAthlete(){
+  const n=document.getElementById('f-name').value.trim(),dob=document.getElementById('f-dob').value;
+  if(!n){alert('Name is required.');return;}
+  const initials=n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)||n[0].toUpperCase();
+  if(EAid){const idx=DB.athletes.findIndex(x=>x.id===EAid);if(idx<0)return;const old=DB.athletes[idx];DB.athletes[idx]={...old,name:n,dob,initials,stroke:document.getElementById('f-stroke').value,level:document.getElementById('f-level').value,gender:document.getElementById('f-gender').value,club:document.getElementById('f-club').value.trim(),email:document.getElementById('f-email').value.trim(),phone:document.getElementById('f-phone').value.trim(),emergencyContact:document.getElementById('f-emergency').value.trim(),goals:document.getElementById('f-goals').value.trim(),notes:document.getElementById('f-notes').value.trim(),photo:PP!==null?PP:old.photo};}
+  else{const color=COLORS[DB.athletes.length%4];DB.athletes.push({id:Date.now(),name:n,dob,initials,color,stroke:document.getElementById('f-stroke').value,level:document.getElementById('f-level').value,gender:document.getElementById('f-gender').value,club:document.getElementById('f-club').value.trim(),email:document.getElementById('f-email').value.trim(),phone:document.getElementById('f-phone').value.trim(),emergencyContact:document.getElementById('f-emergency').value.trim(),goals:document.getElementById('f-goals').value.trim(),notes:document.getElementById('f-notes').value.trim(),photo:PP||null});}
+  sDB();closeM('mo-athlete');renderTree();refresh();
+}
+function delAthlete(){if(!EAid)return;const a=DB.athletes.find(x=>x.id===EAid);if(!confirm(`Delete ${a?.name||'athlete'} and ALL their data? This cannot be undone.`))return;DB.athletes=DB.athletes.filter(x=>x.id!==EAid);DB.analyses=DB.analyses.filter(x=>x.athleteId!==EAid);TDB.records=TDB.records.filter(x=>x.athleteId!==EAid);ADB.sessions.forEach(s=>{s.records=s.records.filter(r=>r.athleteId!==EAid);});FDB.payments=FDB.payments.filter(x=>x.athleteId!==EAid);FDB.enrollments=FDB.enrollments.filter(x=>x.athleteId!==EAid);if(SA===EAid)SA=null;sDB();sTDB();sADB();sFDB();closeM('mo-athlete');renderTree();refresh();}
+
+// ============================================================
+// EXPORT / IMPORT
+// ============================================================
+function dl(data,fn){const b=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=fn;a.click();}
+function expAll(){
+  dl({version:'3.0',exported:new Date().toISOString(),athletes:DB.athletes,analyses:DB.analyses},'swimiq-data.json');
+  setTimeout(()=>dl({version:'3.0',exported:new Date().toISOString(),records:TDB.records},'swimiq-times.json'),350);
+  setTimeout(()=>dl({version:'3.0',exported:new Date().toISOString(),users:UDB.users},'swimiq-users.json'),700);
+  setTimeout(()=>dl({version:'3.0',exported:new Date().toISOString(),sessions:ADB.sessions},'swimiq-attendance.json'),1050);
+  setTimeout(()=>dl({version:'3.0',exported:new Date().toISOString(),...FDB},'swimiq-finance.json'),1400);
+}
+function impData(e){const file=e.target.files[0];if(!file)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);if(d.athletes){DB={athletes:d.athletes,analyses:d.analyses||[]};sDB();}if(d.records){TDB={records:d.records};sTDB();}if(d.users){UDB={users:d.users};sUDB();}if(d.sessions){ADB={sessions:d.sessions};sADB();}if(d.packages||d.payments){FDB={packages:d.packages||FDB.packages,enrollments:d.enrollments||FDB.enrollments,payments:d.payments||FDB.payments};sFDB();}alert('Imported successfully!');renderTree();refresh();}catch(ex){alert('Invalid JSON file.');}};r.readAsText(file);e.target.value='';}
+
+// ============================================================
+// ANALYSIS MODE SWITCH
+// ============================================================
+let AN_MODE='ai';
+let MAT='stroke';
+
+function switchAnMode(mode){
+  AN_MODE=mode;
+  document.getElementById('an-ai-panel').style.display=mode==='ai'?'block':'none';
+  document.getElementById('an-manual-panel').style.display=mode==='manual'?'block':'none';
+  document.getElementById('an-mode-ai').classList.toggle('act',mode==='ai');
+  document.getElementById('an-mode-manual').classList.toggle('act',mode==='manual');
+  if(mode==='manual')buildManualScoresGrid();
+}
+
+const ASPECTS={
+  stroke:['Body Position','Catch Mechanics','Kick Technique','Breathing Pattern','Stroke Timing','Hip Rotation'],
+  start:['Block Reaction','Take-off Angle','Entry Position','Underwater Kick','Breakout Timing','First Stroke'],
+  turn:['Approach Speed','Wall Touch','Push-off Power','Streamline','Breakout Timing','First Stroke'],
+  full:['Start Quality','Stroke Efficiency','Turn Mechanics','Pacing Strategy','Finish','Endurance']
+};
+
+function setMAT(t){
+  MAT=t;
+  document.querySelectorAll('[id^="matab-"]').forEach(x=>x.classList.remove('act'));
+  const el=document.getElementById('matab-'+t);if(el)el.classList.add('act');
+  buildManualScoresGrid();
+}
+
+function buildManualScoresGrid(){
+  const aspects=ASPECTS[MAT]||ASPECTS.stroke;
+  document.getElementById('m-scores-grid').innerHTML=aspects.map(a=>`
+    <div class="fgrp">
+      <label>${a}</label>
+      <input type="number" id="ms-${a.replace(/[^a-z0-9]/gi,'_')}" min="0" max="100" placeholder="75" value="75">
+    </div>`).join('');
+}
+
+function saveManualAnalysis(){
+  const a=getA();if(!a){alert('Select an athlete first.');return;}
+  const scoreVal=parseInt(document.getElementById('m-score').value)||0;
+  const dateVal=document.getElementById('m-date').value||new Date().toISOString().slice(0,10);
+  const summary=document.getElementById('m-summary').value.trim();
+  const aspects=ASPECTS[MAT]||ASPECTS.stroke;
+  const techniqueScores=aspects.map(n=>({name:n,score:parseInt(document.getElementById('ms-'+n.replace(/[^a-z0-9]/gi,'_')).value)||75}));
+  const weaknesses=document.getElementById('m-weaknesses').value.split('\n').map(x=>x.trim()).filter(Boolean);
+  const strengths=document.getElementById('m-strengths').value.split('\n').map(x=>x.trim()).filter(Boolean);
+  const improvements=document.getElementById('m-improvements').value.split('\n').map(x=>x.trim()).filter(Boolean).map(line=>{const parts=line.split('|');return{title:(parts[0]||'').trim(),desc:(parts[1]||'').trim()};});
+  const fixWorkouts=document.getElementById('m-drills').value.split('\n').map(x=>x.trim()).filter(Boolean).map(line=>{const parts=line.split('|');return{drill:(parts[0]||'').trim(),reps:(parts[1]||'').trim(),focus:(parts[2]||'').trim()};});
+  const TL={stroke:'Stroke Technique',start:'Start & Dive',turn:'Turns & Walls',full:'Full Race Review'}[MAT];
+  const entry={id:Date.now(),athleteId:a.id,date:dateVal,score:scoreVal,type:MAT,typeLabel:TL,title:`${a.stroke} — ${TL}`,summary:summary||`Manual analysis by coach. Overall score: ${scoreVal}/100.`,techniqueScores,weaknesses,strengths,improvements,fixWorkouts};
+  DB.analyses.unshift(entry);sDB();
+  // Clear form
+  ['m-score','m-summary','m-weaknesses','m-strengths','m-improvements','m-drills'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('m-date').value='';
+  buildManualScoresGrid();
+  // Show result
+  const bC=scoreVal>=80?'var(--a2)':scoreVal>=55?'var(--a4)':'var(--danger)';
+  const sc=s=>s>=80?'sfg':s>=55?'sfm':'sfr';
+  const st=s=>s>=80?'var(--a2)':s>=55?'var(--a4)':'var(--danger)';
+  document.getElementById('an-out').innerHTML=`
+    <div class="card" style="border-color:var(--a2)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
+        <div><div style="font-size:11px;font-weight:700;color:var(--a2)">✓ Manual Analysis Saved</div><div style="font-size:10px;color:var(--t2)">${a.name} · ${TL} · ${dateVal}</div></div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:52px;color:${bC};line-height:1">${scoreVal}</div>
+      </div>
+      ${summary?`<p style="font-size:11px;color:var(--t2);line-height:1.6;padding:.7rem;background:var(--s2);border-radius:var(--r);border-left:3px solid var(--a2);margin-bottom:.75rem">${summary}</p>`:''}
+      <div class="slbl">Technique Breakdown</div>
+      ${techniqueScores.map(s=>`<div class="srow"><div class="slb">${s.name}</div><div class="str"><div class="sf ${sc(s.score)}" style="width:${s.score}%"></div></div><div class="sval" style="color:${st(s.score)}">${s.score}</div></div>`).join('')}
+      ${weaknesses.length?`<div style="margin-top:.65rem"><div class="slbl">Weak Areas</div>${weaknesses.map(w=>`<span class="tag tag-d">⚠ ${w}</span>`).join('')}</div>`:''}
+      ${strengths.length?`<div style="margin-top:.5rem"><div class="slbl">Strengths</div>${strengths.map(s=>`<span class="tag tag-s">✓ ${s}</span>`).join('')}</div>`:''}
+      <div style="margin-top:.75rem"><button class="btn btn-sm" onclick="goSec('history')">View in Reports →</button></div>
+    </div>`;
+  alert('✓ Manual analysis saved for '+a.name+'!');
+}
+
+// ============================================================
+// MODALS
+// ============================================================
+function closeM(id){document.getElementById(id).classList.remove('open');}
+document.addEventListener('DOMContentLoaded',()=>{
+  document.querySelectorAll('.mo').forEach(el=>el.addEventListener('click',function(e){if(e.target===this)closeM(this.id);}));
+  loadAll();
+  // Init manual scores grid default
+  setTimeout(()=>buildManualScoresGrid(),500);
+  // Set today's date for manual analysis
+  const md=document.getElementById('m-date');if(md)md.value=new Date().toISOString().slice(0,10);
+});
+</script>
+</body>
+</html>
